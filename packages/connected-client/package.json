@@ -1,5 +1,5 @@
 {
-  "name": "connected-client",
+  "name": "@connected/client",
   "version": "0.0.1",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
@@ -22,7 +22,7 @@
     "url": "git+https://github.com/staffino/connected.git"
   },
   "scripts": {
-    "prepare": "run-p build",
+    "prepare": "run-p build lint",
     "coverage": "jest --coverage",
     "test": "run-s test:syntax test:jest",
     "test:syntax": "tsc --noEmit",
