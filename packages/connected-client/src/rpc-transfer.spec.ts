@@ -71,7 +71,7 @@ describe('RpcTransfer', () => {
     expect(result).toBe('10');
   });
 
-  it('handlers function error', async () => {
+  it('handles function error', async () => {
     fetchMock.mockResponseOnce(JSON.stringify([
       { jsonrpc: '2.0', error: { code: 409, message: 'Conflict' }, id: '1' },
     ]));
@@ -79,9 +79,23 @@ describe('RpcTransfer', () => {
     await expect(transfer.request('a', { _name: 'b', params: {} })).rejects.toThrow('Conflict');
   });
 
-  it('handlers transport error', async () => {
+  it('handles transport error', async () => {
     fetchMock.mockRejectOnce(new Error('Transport error'));
     const transfer = new RpcTransfer();
     await expect(transfer.request('a', { _name: 'b', params: {} })).rejects.toThrow('Transport');
+  });
+
+  it('handles invalid response', async () => {
+    fetchMock.mockResponseOnce('x'); // a totally screwed-up response
+    const transfer = new RpcTransfer();
+    await expect(transfer.request('a', { _name: 'b', params: {} })).rejects.toThrow();
+  });
+
+  it('handles invalid request', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify([
+      { jsonrpc: '2.0', id: null }, // no id present in the response (simulates invalid request)
+    ]));
+    const transfer = new RpcTransfer();
+    await expect(transfer.request('a', { _name: 'b', params: {} })).rejects.toThrow();
   });
 });
