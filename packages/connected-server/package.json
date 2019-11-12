@@ -1,0 +1,38 @@
+{
+  "name": "@connected/server",
+  "version": "0.0.2",
+  "description": "A server middleware to process function calls from the client side.",
+  "keywords": [
+    "rpc",
+    "client-server",
+    "middleware"
+  ],
+  "author": "Martin Komara <martin.komara@gmail.com>",
+  "homepage": "https://staffino.github.io/connected/",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "directories": {
+    "dist": "dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staffino/connected.git"
+  },
+  "scripts": {
+    "prepare": "run-p build lint",
+    "coverage": "jest --coverage",
+    "test": "run-s test:syntax test:jest",
+    "test:syntax": "tsc --noEmit",
+    "test:jest": "jest",
+    "prebuild": "npm run clean",
+    "build": "tsc --build .",
+    "lint": "tslint -c \"../../tslint.json\" -p tsconfig.json",
+    "clean": "rimraf coverage build tsconfig.tsbuildinfo"
+  },
+  "bugs": {
+    "url": "https://github.com/staffino/connected/issues"
+  }
+}

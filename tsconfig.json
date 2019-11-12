@@ -15,6 +15,7 @@
     "esModuleInterop": true
   },
   "references": [
-    { "path": "packages/connected-client" }
+    { "path": "packages/connected-client" },
+    { "path": "packages/connected-server" }
   ]
 }
