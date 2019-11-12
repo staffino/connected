@@ -30,7 +30,7 @@
     "prebuild": "npm run clean",
     "build": "tsc --build .",
     "lint": "tslint -c \"../../tslint.json\" -p tsconfig.json",
-    "clean": "rimraf coverage dist"
+    "clean": "rimraf coverage build tsconfig.tsbuildinfo"
   },
   "bugs": {
     "url": "https://github.com/staffino/connected/issues"
