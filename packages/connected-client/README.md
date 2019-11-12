@@ -1,11 +1,11 @@
-# `connected-client`
+# `@connected/client`
 
-> TODO: description
+The hassle free way to call your server-side code.
 
 ## Usage
 
 ```
-const connectedClient = require('connected-client');
+import Client, { rpcTransportMiddleware } from '@connected/client';
 
-// TODO: DEMONSTRATE API
+Client.use(rpcTransportMiddleware());
 ```

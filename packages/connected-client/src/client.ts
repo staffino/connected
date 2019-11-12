@@ -1,22 +1,5 @@
-import Middleware from '../middleware';
-
-type SerializableValue =
-  null | string | number | boolean | Date |
-  { [key: string]: SerializableValue } |
-  SerializableValue[];
-
-type NextFunction = (error?: any) => void;
-
-type Request = {
-  name: string;
-  parameters: SerializableValue[];
-  constructorParameters?: SerializableValue[];
-};
-
-type Response = {
-  data?: SerializableValue;
-  error?: any;
-};
+import Middleware from './middleware';
+import { NextFunction, Request, Response, SerializableValue } from './types';
 
 type RequestHandler = (request: Request, response: Response, next: NextFunction) => void;
 type ErrorRequestHandler = (
@@ -25,7 +8,7 @@ type ErrorRequestHandler = (
 type Handler = RequestHandler | ErrorRequestHandler;
 
 export default class Client {
-  private static global: Client = new Client();
+  private static instance: Client = new Client();
   private middleware = new Middleware();
 
   public use(...handlers: Handler[]) {
@@ -50,15 +33,15 @@ export default class Client {
     parameters: SerializableValue[],
     constructorParameters?: SerializableValue[]): Promise<SerializableValue> {
     const request: Request = { name, parameters, constructorParameters };
-    const response: Response = {};
+    const response: Response = { result: null };
 
     return new Promise((done) => {
       this.middleware.go(done, request, response);
-    });
+    }).then(error => error ? Promise.reject(error) : response.result);
   }
 
   public static use(...handlers: Handler[]) {
-    return Client.global.use(...handlers);
+    return Client.instance.use(...handlers);
   }
 
   public static execute(
@@ -66,6 +49,6 @@ export default class Client {
     parameters: SerializableValue[],
     constructorParameters?: SerializableValue[]) {
 
-    return Client.global.execute(name, parameters, constructorParameters);
+    return Client.instance.execute(name, parameters, constructorParameters);
   }
 }
