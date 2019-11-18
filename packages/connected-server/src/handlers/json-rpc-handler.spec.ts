@@ -2,13 +2,14 @@ import MockReq from 'mock-req';
 import MockRes from 'mock-res';
 import JsonRpcHandler from './json-rpc-handler';
 
-function createRequestMock(
+function createRpcMock(
   method: string, parameters: any[], constructorParameters?: any[],
 ) {
-  return createBatchMock(1, method, parameters, constructorParameters);
+  return createRequestMock(
+    { method, id: 1, jsonrpc: '2.0', params: { parameters, constructorParameters } });
 }
 
-function createBatchMock(
+function createBatchRpcMock(
   count: number = 1,
   method: string,
   parameters: any[],
@@ -16,7 +17,11 @@ function createBatchMock(
 ) {
   const data = [...Array(count)].map((value, index) =>
     ({ method, id: 1 + index, jsonrpc: '2.0', params: { parameters, constructorParameters } }));
-  const requestData = JSON.stringify(count === 1 ? data[0] : data);
+  return createRequestMock(data);
+}
+
+function createRequestMock(data: any) {
+  const requestData = JSON.stringify(data);
   const request = new MockReq(
     { method: 'POST',
       headers: {
@@ -41,7 +46,7 @@ describe('JsonRpcHandler', () => {
 
   it('evaluates single successfully', async () => {
     const handler = new JsonRpcHandler();
-    const request = createRequestMock('add', [1, 2]);
+    const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
     const invoke = jest.fn().mockResolvedValueOnce(3);
     await handler.process(request, response, invoke);
@@ -51,7 +56,7 @@ describe('JsonRpcHandler', () => {
 
   it('evaluates single error', async () => {
     const handler = new JsonRpcHandler();
-    const request = createRequestMock('add', [1, 2]);
+    const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
     const invoke = jest.fn().mockRejectedValueOnce(new Error('internal'));
     await handler.process(request, response, invoke);
@@ -61,7 +66,7 @@ describe('JsonRpcHandler', () => {
 
   it('evaluates batch successfully', async () => {
     const handler = new JsonRpcHandler();
-    const request = createBatchMock(2, 'add', [1, 2]);
+    const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const invoke = jest.fn()
       .mockResolvedValueOnce(3)
@@ -75,7 +80,7 @@ describe('JsonRpcHandler', () => {
 
   it('evaluates batch error', async () => {
     const handler = new JsonRpcHandler();
-    const request = createBatchMock(2, 'add', [1, 2]);
+    const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const invoke = jest.fn()
       .mockRejectedValueOnce(new Error('r1'))
@@ -89,15 +94,42 @@ describe('JsonRpcHandler', () => {
 
   it('evaluates mixed batch', async () => {
     const handler = new JsonRpcHandler();
-    const request = createBatchMock(2, 'add', [1, 2]);
+    const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const invoke = jest.fn()
-    .mockResolvedValueOnce(3)
-    .mockRejectedValueOnce(new Error('r2'));
+      .mockResolvedValueOnce(3)
+      .mockRejectedValueOnce(new Error('r2'));
     await handler.process(request, response, invoke);
     expect(response._getJSON()).toMatchObject([
       { jsonrpc: '2.0', result: 3, id: 1 },
       { jsonrpc: '2.0', error: { message: 'r2' }, id: 2 },
+    ]);
+  });
+
+  it('evaluates batch with input errors', async () => {
+    const handler = new JsonRpcHandler();
+    const request = createRequestMock([
+      { method: 'add', id: 1, jsonrpc: '2.0', params: { parameters: [1, 2] } },
+      { method: 'add', id: 2, jsonrpc: '1.0', params: { parameters: [1, 2] } }, // 1.0
+      { method: 'add', jsonrpc: '1.0', params: { parameters: [1, 2] } }, // notification
+      { method: 'add', id: 3, jsonrpc: '2.0', params: 1 }, // invalid params
+      { method: '', id: 4, jsonrpc: '2.0', params: 1 }, // invalid method name
+      { method: 'add', id: 5, jsonrpc: '2.0' }, // missing params
+      { jsonrpc: '2.0', params: { parameters: [1, 2] } }, // no method
+    ]);
+    const response = new MockRes();
+    const invoke = jest.fn().mockResolvedValue(3);
+    await handler.process(request, response, invoke);
+    expect(response._getJSON()).toMatchObject([
+      { jsonrpc: '2.0', result: 3, id: 1 },
+      { jsonrpc: '2.0', error: { message: 'Internal error', code: -32603 }, id: 2 },
+      { jsonrpc: '2.0', error: { message: 'Internal error', code: -32603 }, id: null },
+      { jsonrpc: '2.0', error: { message: 'Invalid Request', code: -32600 }, id: 3 },
+      { jsonrpc: '2.0', error: { message: 'Invalid Request', code: -32600 }, id: 4 },
+      { jsonrpc: '2.0',
+        error: { message: 'Parameters must by an array of serializable values.', code: -32602 },
+        id: 5 },
+      { jsonrpc: '2.0', error: { message: 'Invalid Request', code: -32600 }, id: null },
     ]);
   });
 });

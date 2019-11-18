@@ -46,10 +46,10 @@ export default class JsonRpcHandler implements IHandler {
         return;
       }
       if (message.type === 'request') {
-        return this.processRequest(message.payload, request, response, invoke);
+        return this.processRequest(message.payload, response, invoke);
       }
       if (message.type === 'batch') {
-        return this.processBatch(message.payload, request, response, invoke);
+        return this.processBatch(message.payload, response, invoke);
       }
 
       // notification ... not sure what to do yet
@@ -68,7 +68,6 @@ export default class JsonRpcHandler implements IHandler {
 
   private processRequest(
     payload: RequestPayload,
-    request: IncommingMessage,
     response: ServerResponse,
     invoke: InvokeCallback,
   ): Promise<void> {
@@ -79,7 +78,6 @@ export default class JsonRpcHandler implements IHandler {
 
   private processBatch(
     payload: (Request | Notification | ParserError)[],
-    request: IncommingMessage,
     response: ServerResponse,
     invoke: InvokeCallback,
   ): Promise<void> {
@@ -105,7 +103,12 @@ export default class JsonRpcHandler implements IHandler {
   private calculateResponse(
     payload: RequestPayload, invoke: InvokeCallback,
   ): Promise<ResponsePayload | ErrorPayload> {
-    const { id, method, params: { parameters, constructorParameters } }  = payload;
+    const {
+      id, method,
+      params: {
+        parameters, constructorParameters,
+      } = { parameters: undefined, constructorParameters: undefined }}  = payload;
+
     if (!Array.isArray(parameters)) {
       return Promise.resolve(createError(
         id, { code: -32602, message: 'Parameters must by an array of serializable values.' }));
