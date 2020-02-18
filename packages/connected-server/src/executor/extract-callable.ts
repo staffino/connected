@@ -1,4 +1,4 @@
-import { Callable } from '../types';
+import { Callable } from './types';
 import buildCallableMap from './build-callabale-map';
 
 function createCallableCollection(fn: Function, file?: string, overrideName?: string): Callable[] {

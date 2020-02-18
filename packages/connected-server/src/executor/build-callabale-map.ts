@@ -1,6 +1,6 @@
-import { Callable } from '../types';
+import { Callable, CallableMap } from './types';
 
-export default function buildCallableMap(callables: Callable[]): Map<string, Callable> {
+export default function buildCallableMap(callables: Callable[]): CallableMap {
   const map = new Map<string, Callable[]>();
   for (const callable of callables) {
     const key = callable.property ? `${callable.name}.${callable.property}` : callable.name;

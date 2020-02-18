@@ -1,8 +1,8 @@
-import glob from 'glob';
+import glob, { IOptions } from 'glob';
 
-export default function resolveFiles(root: string, pattern: string): Promise<string[]> {
+export default function resolveFiles(pattern: string, options: IOptions): Promise<string[]> {
   return new Promise((resolve, reject) =>
-    glob(pattern, { root }, (err, matches) => {
+    glob(pattern, options, (err, matches) => {
       if (err) {
         reject(err);
       } else {

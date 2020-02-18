@@ -10,24 +10,18 @@ import {
   ResponsePayload,
 } from 'json-rpc-msg';
 import { json } from 'body-parser';
-import { IHandler, SerializableValue } from '../types';
+import { IHandler, IExecutor } from '../types';
 
 type IncommingMessage = import('http').IncomingMessage;
 type ServerResponse = import('http').ServerResponse;
 
 const jsonParser = json();
 
-type InvokeCallback = (
-  name: string,
-  parameters: SerializableValue[],
-  constructorParameters?: SerializableValue[],
-) => Promise<SerializableValue>;
-
 export default class JsonRpcHandler implements IHandler {
   process(
     request: IncommingMessage,
     response: ServerResponse,
-    invoke: InvokeCallback,
+    executor: IExecutor,
   ): Promise<void> {
 
     return new Promise((resolve, reject) => {
@@ -46,10 +40,10 @@ export default class JsonRpcHandler implements IHandler {
         return;
       }
       if (message.type === 'request') {
-        return this.processRequest(message.payload, response, invoke);
+        return this.processRequest(message.payload, response, executor);
       }
       if (message.type === 'batch') {
-        return this.processBatch(message.payload, response, invoke);
+        return this.processBatch(message.payload, response, executor);
       }
 
       // notification ... not sure what to do yet
@@ -63,23 +57,22 @@ export default class JsonRpcHandler implements IHandler {
 
   canHandle(request: IncommingMessage): boolean {
     const contentType = request.headers['content-type'];
-    return !!contentType && contentType.indexOf('application/json') === 0;
+    return contentType?.indexOf('application/json') === 0;
   }
 
   private processRequest(
     payload: RequestPayload,
     response: ServerResponse,
-    invoke: InvokeCallback,
+    executor: IExecutor,
   ): Promise<void> {
-
-    return this.calculateResponse(payload, invoke)
+    return this.calculateResponse(payload, executor)
       .then(rpcResponse => response.end(JSON.stringify(rpcResponse)));
   }
 
   private processBatch(
     payload: (Request | Notification | ParserError)[],
     response: ServerResponse,
-    invoke: InvokeCallback,
+    executor: IExecutor,
   ): Promise<void> {
     return Promise.all(
       payload
@@ -89,7 +82,7 @@ export default class JsonRpcHandler implements IHandler {
             return Promise.resolve(request.rpcError);
           }
           if (request.type === 'request') {
-            return this.calculateResponse(request.payload, invoke);
+            return this.calculateResponse(request.payload, executor);
           }
           // notification - this won't happen because we filtered notifications above
           return Promise.resolve(createError(
@@ -101,7 +94,7 @@ export default class JsonRpcHandler implements IHandler {
   }
 
   private calculateResponse(
-    payload: RequestPayload, invoke: InvokeCallback,
+    payload: RequestPayload, executor: IExecutor,
   ): Promise<ResponsePayload | ErrorPayload> {
     const {
       id, method,
@@ -117,7 +110,7 @@ export default class JsonRpcHandler implements IHandler {
       return Promise.resolve(createError(
         id, { code: -32602, message: 'Constructor parameters must by an array of serializable values.' }));
     }
-    return invoke(method, parameters, constructorParameters)
+    return executor.execute(method, parameters, constructorParameters)
       .then(result => createResponse(id, result))
       .catch((error) => {
         if (error instanceof ParserError) {
