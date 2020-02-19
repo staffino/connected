@@ -48,8 +48,8 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
-    const invoke = jest.fn().mockResolvedValueOnce(3);
-    await handler.process(request, response, invoke);
+    const executor = { execute: jest.fn().mockResolvedValueOnce(3) };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject(
       { jsonrpc: '2.0', result: 3, id: 1 });
   });
@@ -58,8 +58,8 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
-    const invoke = jest.fn().mockRejectedValueOnce(new Error('internal'));
-    await handler.process(request, response, invoke);
+    const executor = { execute: jest.fn().mockRejectedValueOnce(new Error('internal')) };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject(
       { jsonrpc: '2.0', error: { message: 'internal' }, id: 1 });
   });
@@ -68,10 +68,10 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
-    const invoke = jest.fn()
-      .mockResolvedValueOnce(3)
-      .mockResolvedValueOnce(5);
-    await handler.process(request, response, invoke);
+    const executor = {
+      execute: jest.fn().mockResolvedValueOnce(3).mockResolvedValueOnce(5),
+    };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject([
       { jsonrpc: '2.0', result: 3, id: 1 },
       { jsonrpc: '2.0', result: 5, id: 2 },
@@ -82,10 +82,12 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
-    const invoke = jest.fn()
-      .mockRejectedValueOnce(new Error('r1'))
-      .mockRejectedValueOnce(new Error('r2'));
-    await handler.process(request, response, invoke);
+    const executor = {
+      execute: jest.fn()
+        .mockRejectedValueOnce(new Error('r1'))
+        .mockRejectedValueOnce(new Error('r2')),
+    };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject([
       { jsonrpc: '2.0', error: { message: 'r1' }, id: 1 },
       { jsonrpc: '2.0', error: { message: 'r2' }, id: 2 },
@@ -96,10 +98,12 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
-    const invoke = jest.fn()
-      .mockResolvedValueOnce(3)
-      .mockRejectedValueOnce(new Error('r2'));
-    await handler.process(request, response, invoke);
+    const executor = {
+      execute: jest.fn()
+        .mockResolvedValueOnce(3)
+        .mockRejectedValueOnce(new Error('r2')),
+    };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject([
       { jsonrpc: '2.0', result: 3, id: 1 },
       { jsonrpc: '2.0', error: { message: 'r2' }, id: 2 },
@@ -118,8 +122,8 @@ describe('JsonRpcHandler', () => {
       { jsonrpc: '2.0', params: { parameters: [1, 2] } }, // no method
     ]);
     const response = new MockRes();
-    const invoke = jest.fn().mockResolvedValue(3);
-    await handler.process(request, response, invoke);
+    const executor = { execute: jest.fn().mockResolvedValue(3) };
+    await handler.process(request, response, executor);
     expect(response._getJSON()).toMatchObject([
       { jsonrpc: '2.0', result: 3, id: 1 },
       { jsonrpc: '2.0', error: { message: 'Internal error', code: -32603 }, id: 2 },

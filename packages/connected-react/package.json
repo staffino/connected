@@ -1,0 +1,48 @@
+{
+  "name": "@connected/react",
+  "version": "0.0.2",
+  "description": "The hassle free way to call your server-side code",
+  "keywords": [
+    "client-server",
+    "connected",
+    "react",
+    "hooks",
+    "suspense"
+  ],
+  "author": "Martin Komara <martin.komara@gmail.com>",
+  "homepage": "https://staffino.github.io/connected/",
+  "license": "ISC",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "directories": {
+    "dist": "dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staffino/connected.git"
+  },
+  "scripts": {
+    "test": "run-s test:syntax test:jest",
+    "test:syntax": "tsc --noEmit",
+    "test:jest": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/staffino/connected/issues"
+  },
+  "dependencies": {
+    "md5": "^2.2.1",
+    "tiny-lru": "^7.0.2",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.5",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "react-test-renderer": "^16.12.0"
+  }
+}
