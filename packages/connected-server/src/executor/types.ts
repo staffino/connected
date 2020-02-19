@@ -11,7 +11,6 @@ export interface IExecutor {
 }
 
 export interface ExecutorOptions {
-  // empty for now
   instanceBuilder?<T>(klass: Newable<T>, ...args: any[]): T;
 }
 

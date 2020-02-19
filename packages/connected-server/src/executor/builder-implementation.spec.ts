@@ -65,5 +65,24 @@ describe('ExecutorBuilderImplementation', () => {
       expect(eventSink.mock.calls.length).toBe(1);
       expect(eventSink.mock.calls[0][0]).toMatchObject({ name: 'f1' });
     });
+
+    it('passes options to executor', async () => {
+      const resolveRoot = jest.fn();
+      const resolveFiles = jest.fn(async (pattern, options) => []);
+      const requireFile = jest.fn();
+      const extractCallable = jest.fn();
+      const buildCallableMap = jest.fn();
+
+      const builder = new ExecutorBuilderImplementation(
+        resolveRoot,
+        resolveFiles,
+        requireFile,
+        extractCallable,
+        buildCallableMap,
+      );
+      const instanceBuilder = (): null => null;
+      const executor: any = await builder.scanDir({ instanceBuilder });
+      expect(executor.options.instanceBuilder).toBe(instanceBuilder);
+    });
   });
 });

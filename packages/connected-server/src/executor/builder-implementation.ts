@@ -34,6 +34,8 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
     if (!options.ignore) {
       options.ignore = 'node_modules';
     }
+    const { instanceBuilder } = options;
+
     return Promise.resolve()
       .then(() => {
         if (options.root) {
@@ -49,6 +51,6 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
         callables.forEach(callable => this.emit('callableFound', callable));
         return this.buildCallableMap(callables);
       })
-      .then(callableMap => new Executor(callableMap));
+      .then(callableMap => new Executor(callableMap, { instanceBuilder }));
   }
 }
