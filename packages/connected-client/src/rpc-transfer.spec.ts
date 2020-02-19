@@ -1,3 +1,4 @@
+import 'jest-fetch-mock';
 import RpcTransfer from './rpc-transfer';
 
 let uuidValue = 0;
