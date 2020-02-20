@@ -88,9 +88,9 @@ describe('ExecutorBuilderImplementation', () => {
         createMeta,
         buildCallableMap,
       );
-      const instanceBuilder = (): null => null;
-      const executor: any = await builder.scanDir({ factory: instanceBuilder });
-      expect(executor.options.instanceBuilder).toBe(instanceBuilder);
+      const factory = (): null => null;
+      const executor: any = await builder.scanDir({ factory });
+      expect(executor.options.factory).toBe(factory);
     });
   });
 });
