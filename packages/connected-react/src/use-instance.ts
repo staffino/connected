@@ -1,5 +1,5 @@
-import { Newable } from './types';
 import { useContext } from 'react';
+import { Newable } from './types';
 import ConnectedContext from './connected-context';
 
 export default function useInstance<T>(klass: Newable<T>, ...args: any[]): T {
