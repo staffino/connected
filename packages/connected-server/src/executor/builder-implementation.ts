@@ -23,12 +23,13 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
 
   scanDir(dirOrOptions?: ExecutorBuilderScanDirOptions|string): Promise<IExecutor> {
     let options: ExecutorBuilderScanDirOptions = {};
-    if (dirOrOptions === undefined) {
-      options.dir = process.cwd();
+    if (typeof dirOrOptions === 'object') {
+      options = dirOrOptions;
     } else if (typeof dirOrOptions === 'string') {
       options.dir = dirOrOptions;
-    } else {
-      options = dirOrOptions;
+    }
+    if (!options.dir && !options.root) {
+      options.dir = process.cwd();
     }
     if (!options.pattern) {
       options.pattern = '*.server.ts';
