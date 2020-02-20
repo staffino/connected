@@ -1,6 +1,6 @@
 {
   "name": "@connected/auto-bind",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Autobind utility to bind class methods to this automatically",
   "keywords": [
     "autobind",
