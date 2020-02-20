@@ -1,4 +1,5 @@
 import glob, { IOptions } from 'glob';
+import * as path from 'path';
 
 export default function resolveFiles(pattern: string, options: IOptions): Promise<string[]> {
   return new Promise((resolve, reject) =>
@@ -6,7 +7,7 @@ export default function resolveFiles(pattern: string, options: IOptions): Promis
       if (err) {
         reject(err);
       } else {
-        resolve(matches);
+        resolve(matches.map(match => path.join(options.root!, match)));
       }
     }));
 }
