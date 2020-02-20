@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import tinyLru, { Lru as TinyLru } from 'tiny-lru';
 
 export default class Lru<T> extends EventEmitter {
