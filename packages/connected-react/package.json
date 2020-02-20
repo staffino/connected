@@ -1,6 +1,6 @@
 {
   "name": "@connected/react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "client-server",
@@ -40,9 +40,9 @@
   },
   "dependencies": {
     "md5": "^2.2.1",
-    "tiny-lru": "^7.0.2",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "tiny-lru": "^7.0.2"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.5",
