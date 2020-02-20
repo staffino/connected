@@ -46,7 +46,9 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
         }
         return this.resolveRoot(options.dir!);
       })
-      .then(root => this.resolveFiles(options.pattern!, { root, ignore: options.ignore }))
+      .then(root => this.resolveFiles(
+        options.pattern!,
+        { root, ignore: options.ignore, matchBase: true }))
       .then(files => files.map(file => this.requireFile(file)))
       .then(exports => exports.map(
         e => this.extractCallable(e)).reduce((acc, val) => acc.concat(val), []))
