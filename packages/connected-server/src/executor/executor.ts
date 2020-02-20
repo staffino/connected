@@ -17,14 +17,13 @@ export default class Executor implements IExecutor {
   ): Promise<SerializableValue> {
     const callable = this.callableMap.get(name);
     if (!callable) {
-      throw new TypeError(`Function ${name} was not found.`);
+      return Promise.reject(new TypeError(`Function ${name} was not found.`));
     }
     if (typeof callable.fn !== 'function') {
       if (callable.property) {
-        throw new TypeError(`Class ${callable.name} was not found.`);
-      } else {
-        throw new TypeError(`Function ${name} was not found.`);
+        return Promise.reject(new TypeError(`Class ${callable.name} was not found.`));
       }
+      return Promise.reject(new TypeError(`Function ${name} was not found.`));
     }
     if (!callable.property) {
       // just an ordinary function
@@ -36,11 +35,13 @@ export default class Executor implements IExecutor {
       callable.fn as any,
       ...(constructorParameters || []));
     if (!instance) {
-      throw new TypeError(`Unable to create an instance of class ${callable.name}.`);
+      return Promise.reject(
+        new TypeError(`Unable to create an instance of class ${callable.name}.`));
     }
     const method = instance[callable.property];
     if (typeof method !== 'function') {
-      throw new TypeError(`Unable to find method ${callable.name}.${callable.property}`);
+      return Promise.reject(
+        new TypeError(`Unable to find method ${callable.name}.${callable.property}`));
     }
     return Promise.resolve(method.call(instance, ...parameters));
   }
