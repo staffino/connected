@@ -97,11 +97,15 @@ export default class JsonRpcHandler implements IHandler {
     payload: RequestPayload, executor: IExecutor,
   ): Promise<ResponsePayload | ErrorPayload> {
     const {
-      id, method,
+      id,
       params: {
-        parameters, constructorParameters,
-      } = { parameters: undefined, constructorParameters: undefined }}  = payload;
+        name, parameters, constructorParameters,
+      } = { name: undefined, parameters: undefined, constructorParameters: undefined }}  = payload;
 
+    if (!name) {
+      return Promise.resolve(createError(
+        id, { code: -32602, message: 'Function name must be specified.' }));
+    }
     if (!Array.isArray(parameters)) {
       return Promise.resolve(createError(
         id, { code: -32602, message: 'Parameters must by an array of serializable values.' }));
@@ -110,7 +114,7 @@ export default class JsonRpcHandler implements IHandler {
       return Promise.resolve(createError(
         id, { code: -32602, message: 'Constructor parameters must by an array of serializable values.' }));
     }
-    return executor.execute(method, parameters, constructorParameters)
+    return executor.execute(name, parameters, constructorParameters)
       .then(result => createResponse(id, result))
       .catch((error) => {
         if (error instanceof ParserError) {
