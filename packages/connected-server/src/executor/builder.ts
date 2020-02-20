@@ -5,6 +5,7 @@ import resolveRoot from './resolve-root';
 import resolveFiles from './resolve-files';
 import requireFile from './require-file';
 import extractCallable from './extract-callable';
+import createMeta from './create-meta';
 import buildCallableMap from './build-callabale-map';
 
 export default class ExecutorBuilder extends EventEmitter {
@@ -14,6 +15,7 @@ export default class ExecutorBuilder extends EventEmitter {
     resolveFiles,
     requireFile,
     extractCallable,
+    createMeta,
     buildCallableMap,
   );
 

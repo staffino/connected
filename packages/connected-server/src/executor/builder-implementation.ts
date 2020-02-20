@@ -4,6 +4,7 @@ import { ResolveRoot } from './resolve-root';
 import { ResolveFiles } from './resolve-files';
 import { RequireFile } from './require-file';
 import { ExtractCallable } from './extract-callable';
+import { CreateMeta } from './create-meta';
 import { BuildCallableMap } from './build-callabale-map';
 import Executor from './executor';
 
@@ -14,6 +15,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
     private readonly resolveFiles: ResolveFiles,
     private readonly requireFile: RequireFile,
     private readonly extractCallable: ExtractCallable,
+    private readonly createMeta: CreateMeta,
     private readonly buildCallableMap: BuildCallableMap,
   ) {
     super();
@@ -34,7 +36,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
     if (!options.ignore) {
       options.ignore = 'node_modules';
     }
-    const { instanceBuilder } = options;
+    const { factory } = options;
 
     return Promise.resolve()
       .then(() => {
@@ -48,9 +50,14 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
       .then(exports => exports.map(
         e => this.extractCallable(e)).reduce((acc, val) => acc.concat(val), []))
       .then((callables) => {
-        callables.forEach(callable => this.emit('callableFound', callable));
+        callables.forEach((callable) => {
+          if (options.createMeta !== false) {
+            this.createMeta(callable);
+          }
+          this.emit('callableFound', callable);
+        });
         return this.buildCallableMap(callables);
       })
-      .then(callableMap => new Executor(callableMap, { instanceBuilder }));
+      .then(callableMap => new Executor(callableMap, { factory }));
   }
 }

@@ -5,8 +5,8 @@ type Newable<T> = { new(...args: any[]): T };
 
 export default class Executor implements IExecutor {
   constructor(private callableMap: CallableMap, private options: ExecutorOptions = {}) {
-    if (!this.options.instanceBuilder) {
-      this.options.instanceBuilder = <T>(klass: Newable<T>, ...args: any[]) => new klass(...args);
+    if (!this.options.factory) {
+      this.options.factory = <T>(klass: Newable<T>, ...args: any[]) => new klass(...args);
     }
   }
 
@@ -32,7 +32,7 @@ export default class Executor implements IExecutor {
     }
 
     // class method
-    const instance: { [name: string]: Function } = this.options.instanceBuilder!(
+    const instance: { [name: string]: Function } = this.options.factory!(
       callable.fn as any,
       ...(constructorParameters || []));
     if (!instance) {

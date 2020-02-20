@@ -11,10 +11,14 @@ export interface IExecutor {
 }
 
 export interface ExecutorOptions {
-  instanceBuilder?<T>(klass: Newable<T>, ...args: any[]): T;
+  factory?<T>(klass: Newable<T>, ...args: any[]): T;
 }
 
-export interface ExecutorBuilderScanDirOptions extends ExecutorOptions {
+export interface ExecutorBuilderOptions extends ExecutorOptions{
+  createMeta?: boolean;
+}
+
+export interface ExecutorBuilderScanDirOptions extends ExecutorBuilderOptions {
   root?: string;
   dir?: string;
   pattern?: string;
