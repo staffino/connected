@@ -272,7 +272,7 @@ export default function useResult<
     Request10<R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>,
   ...args: ReadonlyArray<SerializableValue>
 ): R {
-  const { cache } = React.useContext(ConnectedContext);
+  const { cache, dataTtl, errorTtl } = React.useContext(ConnectedContext);
   const fn: Function = typeof fnOrRequest === 'object' ?
     fnOrRequest.fn : fnOrRequest;
   if (typeof fn !== 'function') {
@@ -293,9 +293,9 @@ export default function useResult<
   const data = fn(...parameters);
   if (data instanceof Promise) {
     throw data.then((data) => {
-      cache.set(cacheKey, { data }, 60 * 1000); // TODO: get this configuration from config
+      cache.set(cacheKey, { data }, dataTtl);
     }).catch((error) => {
-      cache.set(cacheKey, { error }, 60 * 1000); // TODO: get this configuration from config
+      cache.set(cacheKey, { error }, errorTtl);
     });
   }
   return data;

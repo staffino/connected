@@ -60,6 +60,15 @@ describe('Lru', () => {
       expect(lru.get('key2')).toBe(2);
       expect(lru.get('key3')).toBe(3);
     });
+
+    it('emits event', () => {
+      const handler = jest.fn();
+      const lru = new Lru();
+      lru.on('set', handler);
+      lru.set('key1', 1);
+      lru.set('key2', 2);
+      expect(handler).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('#clear', () => {

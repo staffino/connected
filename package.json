@@ -4,6 +4,8 @@
   "devDependencies": {
     "@types/body-parser": "^1.17.1",
     "@types/jest": "^24.0.22",
+    "@types/md5": "^2.1.33",
+    "@types/react": "^16.9.20",
     "@types/uuid": "^3.4.6",
     "jest": "^24.9.0",
     "jest-fetch-mock": "^2.1.2",

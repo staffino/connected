@@ -1,9 +1,11 @@
+import EventEmitter from 'events';
 import tinyLru, { Lru as TinyLru } from 'tiny-lru';
 
-export default class Lru<T> {
+export default class Lru<T> extends EventEmitter {
   private lru: TinyLru<{ value: T; ttl?: Date }>;
 
   constructor(maxSize: number = 500) {
+    super();
     this.lru = tinyLru(maxSize);
   }
 
@@ -38,6 +40,7 @@ export default class Lru<T> {
       return t;
     }
     this.lru.set(key, { value, ttl: ttl ? addMs(ttl) : undefined });
+    this.emit('set', key, value);
 
     return this;
   }
