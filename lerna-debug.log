@@ -1,9 +1,0 @@
-0 silly argv { _: [ 'add' ],
-0 silly argv   globs: [],
-0 silly argv   lernaVersion: '3.18.3',
-0 silly argv   '$0': 'lerna',
-0 silly argv   pkg: 'connected-typescript' }
-1 notice cli v3.18.3
-2 verbose rootPath /Users/lucia/WORK/Staffino-Git/connected
-3 error Error: 404 Not Found - GET https://registry.npmjs.org/connected-typescript - Not found
-3 error     at res.buffer.catch.then.body (/Users/lucia/WORK/Staffino-Git/connected/node_modules/@evocateur/npm-registry-fetch/check-response.js:104:15)
