@@ -115,6 +115,7 @@ export default class JsonRpcHandler implements IHandler {
         id, { code: -32602, message: 'Constructor parameters must by an array of serializable values.' }));
     }
     return executor.execute(name, parameters, constructorParameters)
+      .then(result => result ?? null)
       .then(result => createResponse(id, result))
       .catch((error) => {
         if (error instanceof ParserError) {
