@@ -1,0 +1,31 @@
+{
+  "name": "@connected/typescript",
+  "version": "0.0.2",
+  "description": "The hassle free way to call your server-side code",
+  "keywords": [
+    "typescript",
+    "transformer",
+    "transpiler"
+  ],
+  "author": "Lucia Gotthardova <lucia@staffino.com>",
+  "homepage": "https://staffino.github.io/connected/",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staffino/connected.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/staffino/connected/issues"
+  }
+}
