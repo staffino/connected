@@ -1,19 +1,30 @@
-import compile from '../spec/compiler';
 import readFile from '../spec/read-file';
-import { default as transformer } from './transformer';
+import transpile from '../spec/transpile';
+import transformer from './transformer';
 
-describe('ServerASTTransformer', () => {
+describe('Transformer', () => {
 
-  it('transforms sync named function', async () => {
-    const output = await compile('./files/sync-named-function.input.ts', transformer({ type: 'function' }));
-    const expected = await readFile('./files/sync-named-function.output.js');
-    expect(output).toBe(expected);
-  });
+  it.each([
+    'named-function',
+    'default-function',
+    'async-function',
+    'non-exported-function',
+    'nested-function',
 
-  it('transforms sync class', async () => {
-    const output = await compile('./files/sync-class.input.ts', transformer({ type: 'class' }));
-    const expected = await readFile('./files/sync-class.output.js');
-    expect(output).toBe(expected);
+    'named-class',
+    'default-class',
+    'private-method',
+    'static-method',
+    'abstract-method',
+
+    'imports',
+    'statements',
+
+    'wild-west',
+  ])('transforms %s correctly', async (file) => {
+    const result = await transpile(`./files/${file}.input.ts`, transformer());
+    const test = await readFile(`./files/${file}.output.js`);
+    expect(result).toEqual(test);
   });
 
 });

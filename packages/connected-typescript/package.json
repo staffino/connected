@@ -12,11 +12,10 @@
   "license": "ISC",
   "main": "dist/index.js",
   "directories": {
-    "lib": "lib",
-    "test": "__tests__"
+    "dist": "dist"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -27,5 +26,8 @@
   },
   "bugs": {
     "url": "https://github.com/staffino/connected/issues"
+  },
+  "dependencies": {
+    "array-flatten": "^3.0.0"
   }
 }
