@@ -22,7 +22,15 @@
     "url": "git+https://github.com/staffino/connected.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "prepare": "run-p build lint",
+    "coverage": "jest --coverage",
+    "test": "run-s test:syntax test:jest",
+    "test:syntax": "tsc --noEmit",
+    "test:jest": "jest",
+    "prebuild": "npm run clean",
+    "build": "tsc --build .",
+    "lint": "tslint -c \"../../tslint.json\" -p tsconfig.json",
+    "clean": "rimraf coverage build tsconfig.tsbuildinfo"
   },
   "bugs": {
     "url": "https://github.com/staffino/connected/issues"
