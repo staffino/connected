@@ -1,6 +1,6 @@
 {
   "name": "@connected/server",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A server middleware to process function calls from the client side.",
   "keywords": [
     "rpc",
