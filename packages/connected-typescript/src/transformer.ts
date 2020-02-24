@@ -214,7 +214,12 @@ class Transformer {
           [ts.createReturn(
             ts.createCall(
               ts.createPropertyAccess(
-                ts.createIdentifier(module === ts.ModuleKind.CommonJS ? 'client_1' : 'Client'),
+                module === ts.ModuleKind.CommonJS ?
+                  ts.createPropertyAccess(
+                    ts.createIdentifier('client_1'),
+                    ts.createIdentifier('default'),
+                  ) :
+                  ts.createIdentifier('Client'),
                 ts.createIdentifier('execute'),
               ),
               undefined,
@@ -363,8 +368,12 @@ class Transformer {
               [
                 ts.createExpressionStatement(
                   ts.createCall(
-                    ts.createIdentifier(module === ts.ModuleKind.CommonJS
-                      ? 'auto_bind_1' : 'autoBind'),
+                    module === ts.ModuleKind.CommonJS ?
+                      ts.createPropertyAccess(
+                        ts.createIdentifier('auto_bind_1'),
+                        ts.createIdentifier('default'),
+                      ) :
+                      ts.createIdentifier('autoBind'),
                     undefined,
                     [ts.createThis()],
                   )),
@@ -405,7 +414,12 @@ class Transformer {
       ts.createBlock(
         [ts.createReturn(ts.createCall(
           ts.createPropertyAccess(
-            ts.createIdentifier(module === ts.ModuleKind.CommonJS ? 'client_1' : 'Client'),
+            module === ts.ModuleKind.CommonJS ?
+              ts.createPropertyAccess(
+                ts.createIdentifier('client_1'),
+                ts.createIdentifier('default'),
+              ) :
+              ts.createIdentifier('Client'),
             ts.createIdentifier('execute'),
           ),
           undefined,
