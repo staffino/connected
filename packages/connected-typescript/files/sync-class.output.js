@@ -1,4 +1,4 @@
-import { Client } from "@connected/client";
+import Client from "@connected/client";
 export class ExportedClass {
     constructor(...args) {
         this.constructorParameters = args;

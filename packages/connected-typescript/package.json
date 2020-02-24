@@ -36,6 +36,7 @@
     "url": "https://github.com/staffino/connected/issues"
   },
   "dependencies": {
-    "array-flatten": "^3.0.0"
+    "array-flatten": "^3.0.0",
+    "minimatch": "^3.0.4"
   }
 }

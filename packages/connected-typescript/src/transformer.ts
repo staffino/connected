@@ -1,9 +1,11 @@
 import * as ts from 'typescript';
 import { flatten } from 'array-flatten';
+import minimatch from 'minimatch';
 
 type Options = {
   autoBind?: boolean;
   generateMeta?: boolean;
+  pattern?: string|RegExp;
 };
 
 export default function transform(options?: Options): ts.TransformerFactory<ts.SourceFile> {
@@ -38,6 +40,19 @@ class Transformer {
   }
 
   transformSource(sourceFile: ts.SourceFile) {
+    if (this.options.pattern) {
+      if (typeof this.options.pattern === 'string' &&
+        !minimatch(sourceFile.fileName, this.options.pattern)) {
+
+        return sourceFile;
+      }
+      if (typeof this.options.pattern === 'object' &&
+        'test' in this.options.pattern &&
+        !this.options.pattern.test(sourceFile.fileName)) {
+
+        return sourceFile;
+      }
+    }
     return ts.visitNode(sourceFile, this.visitor);
   }
 
@@ -88,8 +103,11 @@ class Transformer {
         ...this.generateImports(this.options, this.definitions),
         ...this.definitions.map(definition => this.generateDefinitions(definition, this.options)),
       ]);
-      source.statements = ts.createNodeArray(flattenedStatements);
-      return source;
+
+      return ts.updateSourceFileNode(
+        source,
+        ts.setTextRange(ts.createNodeArray(flattenedStatements), source.statements),
+      );
     }
 
     return node;
@@ -117,22 +135,16 @@ class Transformer {
    *   import autoBind from '@connected/auto-bind';
    */
   private generateImports(options: Options, definitions: Definition[]) {
-    const imports = [];
-    imports.push(
+    const imports = [
       ts.createImportDeclaration(
         undefined,
         undefined,
         ts.createImportClause(
+          ts.createIdentifier('Client'),
           undefined,
-          ts.createNamedImports(
-            [ts.createImportSpecifier(
-              undefined,
-              ts.createIdentifier('Client'),
-            )],
-          ),
         ),
         ts.createStringLiteral('@connected/client'),
-      ));
+      )];
 
     if (
       options.autoBind !== false &&
@@ -173,6 +185,7 @@ class Transformer {
    *   }
    */
   private generateFunctionDefinition(definition: FunctionDefinition, options: Options) {
+    const { module } = this.context.getCompilerOptions();
 
     const modifiers: ts.Modifier[] = [ts.createModifier(ts.SyntaxKind.ExportKeyword)];
     if (definition.default) {
@@ -201,7 +214,7 @@ class Transformer {
           [ts.createReturn(
             ts.createCall(
               ts.createPropertyAccess(
-                ts.createIdentifier('Client'),
+                ts.createIdentifier(module === ts.ModuleKind.CommonJS ? 'client_1' : 'Client'),
                 ts.createIdentifier('execute'),
               ),
               undefined,
@@ -318,6 +331,8 @@ class Transformer {
    *   }
    */
   private generateClassConstructor(options: Options) {
+    const { module } = this.context.getCompilerOptions();
+
     return ts.createConstructor(
       undefined,
       undefined,
@@ -348,7 +363,8 @@ class Transformer {
               [
                 ts.createExpressionStatement(
                   ts.createCall(
-                    ts.createIdentifier('autoBind'),
+                    ts.createIdentifier(module === ts.ModuleKind.CommonJS
+                      ? 'auto_bind_1' : 'autoBind'),
                     undefined,
                     [ts.createThis()],
                   )),
@@ -367,6 +383,8 @@ class Transformer {
    *   }
    */
   private generateClassMethod(className: string, methodName: string) {
+    const { module } = this.context.getCompilerOptions();
+
     return ts.createMethod(
       undefined,
       undefined,
@@ -387,7 +405,7 @@ class Transformer {
       ts.createBlock(
         [ts.createReturn(ts.createCall(
           ts.createPropertyAccess(
-            ts.createIdentifier('Client'),
+            ts.createIdentifier(module === ts.ModuleKind.CommonJS ? 'client_1' : 'Client'),
             ts.createIdentifier('execute'),
           ),
           undefined,

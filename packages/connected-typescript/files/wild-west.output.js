@@ -1,4 +1,4 @@
-import { Client } from "@connected/client";
+import Client from "@connected/client";
 import autoBind from "@connected/auto-bind";
 export default class EventEmitterProvider {
     constructor(...args) {

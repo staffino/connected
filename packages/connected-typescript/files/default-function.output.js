@@ -1,4 +1,4 @@
-import { Client } from "@connected/client";
+import Client from "@connected/client";
 export default function defaultFunction(...args) {
     return Client.execute("defaultFunction", args);
 }

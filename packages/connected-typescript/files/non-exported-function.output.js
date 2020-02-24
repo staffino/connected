@@ -1,1 +1,1 @@
-import { Client } from "@connected/client";
+import Client from "@connected/client";
