@@ -42,7 +42,7 @@ class Transformer {
   transformSource(sourceFile: ts.SourceFile) {
     if (this.options.pattern) {
       if (typeof this.options.pattern === 'string' &&
-        !minimatch(sourceFile.fileName, this.options.pattern)) {
+        !minimatch(sourceFile.fileName, this.options.pattern, { matchBase: true })) {
 
         return sourceFile;
       }
