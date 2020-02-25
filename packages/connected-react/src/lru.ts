@@ -54,4 +54,8 @@ export default class Lru<T> extends EventEmitter {
     this.lru.delete(key);
     return this;
   }
+
+  public isEmpty(): boolean {
+    return this.lru.size === 0;
+  }
 }

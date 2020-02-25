@@ -92,4 +92,30 @@ describe('Lru', () => {
       expect(lru.has('key2')).toBe(true);
     });
   });
+
+  describe('#isEmpty', () => {
+    it('is empty for new cache', () => {
+      const lru = new Lru();
+      expect(lru.isEmpty()).toBe(true);
+    });
+
+    it('is not empty after adding an item', () => {
+      const lru = new Lru();
+      lru.set('key1', 1);
+      expect(lru.isEmpty()).toBe(false);
+    });
+
+    it('is empty after clear', () => {
+      const lru = new Lru();
+      lru.clear();
+      expect(lru.isEmpty()).toBe(true);
+    });
+
+    it('is empty removing last item', () => {
+      const lru = new Lru();
+      lru.set('key1', 1);
+      lru.delete('key1');
+      expect(lru.isEmpty()).toBe(true);
+    });
+  });
 });
