@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { CacheItem, SerializableValue, Newable } from './types';
 import Lru from './lru';
 import ConnectedContext from './connected-context';
@@ -27,28 +27,25 @@ const ConnectedProvider = ({
 
   children,
 }: Props) => {
-  const { current: cache } = useRef(new Lru<CacheItem>(maxCacheSize));
   const handleCacheUpdate = useCallback(
     (key, value) => {
-      if (onCacheUpdate) {
-        onCacheUpdate(key, value);
+      if (onCacheUpdate && value.data) {
+        onCacheUpdate(key, value.data);
       }
     },
-    [cache]);
-  useEffect(
-    () => {
-      for (const i in initialCacheData) {
-        if (initialCacheData.hasOwnProperty(i)) {
-          cache.set(i, { data: initialCacheData[i] }, dataTtl);
-        }
-      }
-      cache.on('set', handleCacheUpdate);
+    [onCacheUpdate]);
+  const { current: cache } = useRef(new Lru<CacheItem>(maxCacheSize));
 
-      return () => {
-        cache.off('set', handleCacheUpdate);
-      };
-    },
-    [cache]);
+  if (cache.isEmpty() && initialCacheData) {
+    for (const i in initialCacheData) {
+      if (initialCacheData.hasOwnProperty(i)) {
+        cache.set(i, { data: initialCacheData[i] }, dataTtl);
+      }
+    }
+  }
+  if (cache.listenerCount('set') === 0) {
+    cache.on('set', handleCacheUpdate);
+  }
 
   return React.createElement(
     ConnectedContext.Provider,
