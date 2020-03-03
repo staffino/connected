@@ -113,6 +113,13 @@ class Transformer {
     return node;
   }
 
+  /**
+   * Extracts class methods, which are:
+   *   - not static
+   *   - not abstract
+   *   - not private
+   *   - named
+   */
   private extractMembers(members: ts.NodeArray<ts.ClassElement>): string[] {
     return members
       .filter(member => ts.isMethodDeclaration(member))
@@ -131,7 +138,7 @@ class Transformer {
 
   /**
    * Generates imports:
-   *   import { Client } from '@connected/client';
+   *   import Client from '@connected/client';
    *   import autoBind from '@connected/auto-bind';
    */
   private generateImports(options: Options, definitions: Definition[]) {
@@ -165,6 +172,9 @@ class Transformer {
     return imports;
   }
 
+  /**
+   * Generates function and class definitions.
+   */
   generateDefinitions(definition: Definition, options: Options) {
     switch (definition.kind) {
       case 'function':
@@ -183,6 +193,9 @@ class Transformer {
    *   export [default] function functionName(...args) {
    *     return Client.execute('functionName', args);
    *   }
+   *
+   * together with its metadata:
+   *   Object.defineProperty(functionName, 'meta', { value: { name: 'functionName' } });
    */
   private generateFunctionDefinition(definition: FunctionDefinition, options: Options) {
     const { module } = this.context.getCompilerOptions();
@@ -265,6 +278,23 @@ class Transformer {
     return definitions;
   }
 
+  /**
+   * Generates class:
+   *   export [default] class ClassName {
+   *     constructor(...args) {
+   *       this.constructorParameters = args;
+   *       autoBind(this);
+   *     }
+   *     methodName(...args) {
+   *       return Client.execute('ClassName.methodName', args, this?.constructorParameters);
+   *     }
+   *   }
+   *
+   * together with its methods' metadata:
+   *   Object.defineProperty(
+   *     ClassName.prototype.methodName, "meta", { value: { name: "ClassName.methodName" } }
+   *   );
+   */
   generateClassDefinition(definition: ClassDefinition, options: Options) {
     const statements: ts.Statement[] = [];
 
@@ -333,6 +363,7 @@ class Transformer {
    * Generates class constructor:
    *   constructor(...args) {
    *     this.constructorParameters = args;
+   *     autoBind(this);
    *   }
    */
   private generateClassConstructor(options: Options) {

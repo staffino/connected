@@ -13,6 +13,7 @@ describe('Transformer', () => {
 
     'named-class',
     'default-class',
+    'sync-class',
     'private-method',
     'static-method',
     'abstract-method',

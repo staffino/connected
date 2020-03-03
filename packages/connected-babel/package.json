@@ -1,8 +1,9 @@
 {
-  "name": "@connected/typescript",
-  "version": "0.0.18",
+  "name": "@connected/babel",
+  "version": "0.0.17",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
+    "babel",
     "typescript",
     "transformer",
     "transpiler"
@@ -37,8 +38,9 @@
   },
   "dependencies": {
     "array-flatten": "^3.0.0",
-    "@babel/core": "^7.8.4",
-    "@babel/types": "^7.8.3",
     "minimatch": "^3.0.4"
+  },
+  "devDependencies": {
+    "@types/babel-core": "^6.25.6"
   }
 }
