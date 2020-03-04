@@ -7,15 +7,15 @@ export default class EventEmitterProvider {
   }
 
   invokeError(...args) {
-    return Client.execute("EventEmitterProvider.invokeError", args, this ? this.constructorParameters : null);
+    return Client.execute("EventEmitterProvider.invokeError", args, this ? this.constructorParameters : undefined);
   }
 
   notifyError(...args) {
-    return Client.execute("EventEmitterProvider.notifyError", args, this ? this.constructorParameters : null);
+    return Client.execute("EventEmitterProvider.notifyError", args, this ? this.constructorParameters : undefined);
   }
 
   formatError(...args) {
-    return Client.execute("EventEmitterProvider.formatError", args, this ? this.constructorParameters : null);
+    return Client.execute("EventEmitterProvider.formatError", args, this ? this.constructorParameters : undefined);
   }
 
 }

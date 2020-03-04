@@ -181,13 +181,10 @@ class Transformer {
       .filter((method: babel.Node) => !('static' in method && method.static) &&
         !('abstract' in method && method.abstract) &&
         !('accessibility' in method && method.accessibility === 'private'),
-      ).map(
-        function (method: babel.Node) {
-          const name = 'key' in method && this.t.isIdentifier(method.key) && method.key?.name;
-          return name ?? '';
-        },
-        this,
-      ).filter(name => name.length > 0);
+      ).map((method: babel.Node) => {
+        const name = 'key' in method && this.t.isIdentifier(method.key) && method.key?.name;
+        return name ?? '';
+      }).filter(name => name.length > 0);
   }
 
   /**
@@ -247,8 +244,6 @@ class Transformer {
     definition: FunctionDefinition, options: Options): ClassesFunctionsMeta[] {
 
     const definitions = [];
-
-    // const { module } = this.context.getCompilerOptions();
 
     // 1. generate function declaration
     const functionDeclaration: t.FunctionDeclaration =
@@ -471,7 +466,7 @@ class Transformer {
                 this.t.memberExpression(
                   this.t.thisExpression(), this.t.identifier('constructorParameters'), false,
                 ),
-                this.t.nullLiteral(),
+                this.t.identifier('undefined'),
               ),
             ],
           ),

@@ -7,11 +7,11 @@ export class ExportedClass {
   }
 
   classAsyncNamedMethod(...args) {
-    return Client.execute("ExportedClass.classAsyncNamedMethod", args, this ? this.constructorParameters : null);
+    return Client.execute("ExportedClass.classAsyncNamedMethod", args, this ? this.constructorParameters : undefined);
   }
 
   classNamedMethod(...args) {
-    return Client.execute("ExportedClass.classNamedMethod", args, this ? this.constructorParameters : null);
+    return Client.execute("ExportedClass.classNamedMethod", args, this ? this.constructorParameters : undefined);
   }
 
 }
@@ -32,7 +32,7 @@ export default class ExportedDefaultClass {
   }
 
   doAnything(...args) {
-    return Client.execute("ExportedDefaultClass.doAnything", args, this ? this.constructorParameters : null);
+    return Client.execute("ExportedDefaultClass.doAnything", args, this ? this.constructorParameters : undefined);
   }
 
 }

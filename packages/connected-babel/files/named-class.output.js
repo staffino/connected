@@ -7,11 +7,11 @@ export class Named {
   }
 
   f1(...args) {
-    return Client.execute("Named.f1", args, this ? this.constructorParameters : null);
+    return Client.execute("Named.f1", args, this ? this.constructorParameters : undefined);
   }
 
   f2(...args) {
-    return Client.execute("Named.f2", args, this ? this.constructorParameters : null);
+    return Client.execute("Named.f2", args, this ? this.constructorParameters : undefined);
   }
 
 }
