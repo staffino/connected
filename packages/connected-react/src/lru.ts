@@ -56,6 +56,7 @@ export default class Lru<T> extends EventEmitter {
   }
 
   public isEmpty(): boolean {
-    return this.lru.size === 0;
+    const { size } = this.lru as any; // no interface for size?
+    return size === 0;
   }
 }
