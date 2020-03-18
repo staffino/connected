@@ -1,8 +1,18 @@
-import { useContext } from 'react';
 import { Newable } from './types';
-import ConnectedContext from './connected-context';
+import useInstanceWithCommands from './use-instance-with-commands';
 
-export default function useInstance<T>(klass: Newable<T>, ...args: any[]): T {
-  const { factory } = useContext(ConnectedContext);
-  return factory(klass, ...args);
+export default function useInstance<
+  T extends object,
+  C extends Newable<T> = Newable<T>,
+>(
+  klass: C, ...args: any[]
+): T;
+export default function useInstance<
+  T extends object,
+  C extends Newable<T> = Newable<T>,
+>(
+  klass: C, ...args: ConstructorParameters<C>
+): T {
+  const [instance] = useInstanceWithCommands<T>(klass, ...args);
+  return instance;
 }

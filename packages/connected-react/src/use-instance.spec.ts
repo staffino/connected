@@ -8,7 +8,7 @@ class X {
   constructor(a1: string) {
   }
 
-  toString() {
+  str() {
     return '42';
   }
 }
@@ -17,19 +17,19 @@ class Y {
   constructor() {
   }
 
-  toString() {
+  str() {
     return '3.14';
   }
 }
 
 const Wrapper = ({ hookFn }: { hookFn: Function }) => {
   const data = hookFn();
-  return React.createElement(React.Fragment, null, data.toString());
+  return React.createElement(React.Fragment, null, data.str());
 };
 const CustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
   return React.createElement(
     ConnectedProvider,
-    { factory: <T>(klass: Newable<T>, ...args: any[]) => new Y() as T },
+    { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass() },
     React.createElement(Wrapper, { hookFn }),
   );
 };
@@ -41,7 +41,7 @@ describe('useInstance', () => {
 
   it('creates an instance using custom factory', () => {
     const wrapper = mount(React.createElement(
-      CustomFactoryWrapper, { hookFn: () => useInstance(X) }));
+      CustomFactoryWrapper, { hookFn: () => useInstance(Y) }));
     expect(wrapper.text()).toBe('3.14');
   });
 });
