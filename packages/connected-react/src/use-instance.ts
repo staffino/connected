@@ -2,17 +2,17 @@ import { Newable } from './types';
 import useInstanceWithCommands from './use-instance-with-commands';
 
 export default function useInstance<
-  T extends object,
-  C extends Newable<T> = Newable<T>,
->(
+  C extends Newable<T>,
+  T extends object = InstanceType<C>
+  >(
   klass: C, ...args: any[]
 ): T;
 export default function useInstance<
-  T extends object,
-  C extends Newable<T> = Newable<T>,
+  C extends Newable<T>,
+  T extends object = InstanceType<C>,
 >(
   klass: C, ...args: ConstructorParameters<C>
 ): T {
-  const [instance] = useInstanceWithCommands<T>(klass, ...args);
+  const [instance] = useInstanceWithCommands<C, T>(klass, ...args);
   return instance;
 }
