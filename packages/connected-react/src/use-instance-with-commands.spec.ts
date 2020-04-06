@@ -18,8 +18,7 @@ class X {
 const CommandWrapper = ({ hookFn }: { hookFn: Function }) => {
   const [, data] = hookFn();
   const command = data.str();
-  const method = command.method.bind(command.instance);
-  return React.createElement(React.Fragment, null, method());
+  return React.createElement(React.Fragment, null, command());
 };
 const CommandCustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
   return React.createElement(

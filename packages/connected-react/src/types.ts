@@ -27,17 +27,16 @@ export type CommandBuilder<
 > = {
   [M in FunctionKeys<T>]: (...args: Parameters<T[M]>) => Command<M, C, T>;
 };
-export type Command<
+export interface Command<
   M extends FunctionKeys<T>,
   C extends Newable<T>,
   T extends object = InstanceType<C>,
-> = {
-  instance: T;
-  method: T[M];
+> {
+  () : ReturnType<T[M]>;
   parameters: Parameters<T[M]>;
   constructorParameters: ConstructorParameters<C>;
   meta?: Meta;
-};
+}
 
 export type Meta = {
   name: string;

@@ -1,27 +1,24 @@
 import React from 'react';
 import md5 from 'md5';
+import stringify from 'fast-json-stable-stringify';
 import {
   Command, FunctionKeys, Newable, SerializableFunction, SerializableValue, StripPromise,
 } from './types';
 import ConnectedContext from './connected-context';
 
 function cacheKeyFn(fn: Function, params: readonly SerializableValue[]) {
-  const { meta } = fn as any;
+  const { meta, ...functionProperties } = fn as any;
   if (!meta) {
     console.warn(`Function ${fn.name} has no associated meta. Make sure your transpiler is configured correctly.`);
   }
   const name = meta?.name ?? fn.name;
-  return md5(`${name}.${JSON.stringify(params)}`);
+  return md5(stringify([name, functionProperties, ...params]));
 }
-
-type UseResultOptions = {
-  cacheKey?: string;
-};
 
 export default function useResult<
   M extends FunctionKeys<T>,
   T extends object,
->(command: Command<M, Newable<T>, T>, options?: UseResultOptions): StripPromise<ReturnType<T[M]>>;
+>(command: Command<M, Newable<T>, T>): StripPromise<ReturnType<T[M]>>;
 
 export default function useResult<
   F extends SerializableFunction,
@@ -41,24 +38,12 @@ export default function useResult<
   ...args: P
 ) {
   const { cache, dataTtl, errorTtl } = React.useContext(ConnectedContext);
-  let fn: Function;
-  let parameters: any[];
-  let cacheKey: string;
-  if (typeof fnOrCommand === 'function') {
-    fn = fnOrCommand;
-    parameters = args;
-    cacheKey = cacheKeyFn(fn, parameters);
-  } else {
-    const method: Function = fnOrCommand.method as any;
-    fn = method.bind(fnOrCommand.instance);
-    parameters = fnOrCommand.parameters;
-    const options = args[0] as UseResultOptions;
-    cacheKey = options?.cacheKey ?? cacheKeyFn(fn, parameters);
-  }
+  const fn: Function = fnOrCommand;
   if (typeof fn !== 'function') {
     throw new TypeError(`${fn} is not a function`);
   }
 
+  const cacheKey: string = cacheKeyFn(fn, args);
   const entry = cache.get(cacheKey);
   if (entry) {
     if (entry.error) {
@@ -66,7 +51,7 @@ export default function useResult<
     }
     return entry.data as SerializableValue;
   }
-  const data = fn(...parameters);
+  const data = fn(...args);
   if (data instanceof Promise) {
     throw data.then((data) => {
       cache.set(cacheKey, { data }, dataTtl);

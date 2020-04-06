@@ -34,13 +34,14 @@ function buildCommands<
     const property = properties[i];
     const existingMethod = anInstance[property];
     if (property !== 'constructor' && typeof existingMethod === 'function') {
-      commands[property] = (...parameters: any[]) => ({
-        instance,
-        parameters,
-        constructorParameters,
-        method: existingMethod,
-        meta: existingMethod.meta,
-      });
+      commands[property] = (...parameters: any[]) => {
+        const fn = () => existingMethod.bind(instance)(...parameters);
+        fn.parameters = parameters;
+        fn.constructorParameters = constructorParameters;
+        fn.meta = existingMethod.meta;
+
+        return fn;
+      };
     }
   }
   return commands;

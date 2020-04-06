@@ -60,12 +60,10 @@ function buildCommand<
   method: M,
   ...args: Parameters<T[M]>
 ): Command<M, Newable<T>, T> {
-  return {
-    instance,
-    method: instance[method],
-    parameters: args,
-    constructorParameters: [0],
-  };
+  const fn = () => (instance[method] as Function).bind(instance)(...args);
+  fn.parameters = args;
+  fn.constructorParameters = [0];
+  return fn;
 }
 
 /* ========== Static type tests start ========== */
