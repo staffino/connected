@@ -32,7 +32,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
       options.dir = process.cwd();
     }
     if (!options.pattern) {
-      options.pattern = '*.server.ts';
+      options.pattern = __filename.match(/\.ts$/) ? '*.server.ts' : '*.server.js';
     }
     if (!options.ignore) {
       options.ignore = 'node_modules';
