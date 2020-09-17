@@ -22,6 +22,10 @@ class X {
 const useCommands0 = () => useCommands(X, '3.14').str()();
 assert<IsExact<ReturnType<typeof useCommands0>, string>>(true);
 
+// str() return type is string even withou constructor parameters
+const useCommands1 = () => useCommands(X).str()();
+assert<IsExact<ReturnType<typeof useCommands1>, string>>(true);
+
 const Wrapper = ({ hookFn }: { hookFn: Function }) => {
   const data = hookFn();
   const command = data.str();

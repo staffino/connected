@@ -5,7 +5,7 @@ import ConnectedContext from './connected-context';
 export default function useInstanceWithCommands<
   C extends Newable<T>,
   T extends object = InstanceType<C>,
-  A extends unknown[] = ConstructorParameters<C>|any[],
+  A extends unknown[] = ConstructorParameters<C>|[],
 >(klass: C, ...args: A): [T, CommandBuilder<C, T>] {
   const { factory } = useContext(ConnectedContext);
   const instance = factory(klass, ...args);
