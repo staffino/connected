@@ -3,6 +3,7 @@ import { mount } from 'enzyme';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
 import useInstanceWithCommands from './use-instance-with-commands';
+import { assert, IsExact } from 'conditional-type-checks';
 
 class X {
   p1: string;
@@ -14,6 +15,17 @@ class X {
     return this.a1 ?? '42';
   }
 }
+
+/* Static types check */
+
+// str() command return type is string
+const fn0 = () => useInstanceWithCommands(X, '3.14')[1].str()();
+assert<IsExact<ReturnType<typeof fn0>, string>>(true);
+
+// str() instance return type is string
+const fn1 = () => useInstanceWithCommands(X, '3.14')[0].str();
+assert<IsExact<ReturnType<typeof fn1>, string>>(true);
+
 
 const CommandWrapper = ({ hookFn }: { hookFn: Function }) => {
   const [, data] = hookFn();

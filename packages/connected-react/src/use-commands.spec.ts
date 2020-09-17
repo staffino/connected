@@ -3,6 +3,7 @@ import { mount } from 'enzyme';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
 import useCommands from './use-commands';
+import { assert, IsExact } from 'conditional-type-checks';
 
 class X {
   p1: string;
@@ -14,6 +15,12 @@ class X {
     return this.a1 ?? '42';
   }
 }
+
+/* Static types check */
+
+// str() return type is string
+const useCommands0 = () => useCommands(X, '3.14').str()();
+assert<IsExact<ReturnType<typeof useCommands0>, string>>(true);
 
 const Wrapper = ({ hookFn }: { hookFn: Function }) => {
   const data = hookFn();
@@ -27,7 +34,7 @@ const CustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
     React.createElement(Wrapper, { hookFn }),
   );
 };
-describe('useInstance', () => {
+describe('useCommands', () => {
   it('creates a command object', () => {
     const wrapper = mount(React.createElement(Wrapper, { hookFn: () => useCommands(X, '3.14') }));
     expect(wrapper.text()).toBe('3.14');
