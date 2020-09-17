@@ -29,7 +29,7 @@
     "test:jest": "jest",
     "prebuild": "npm run clean",
     "build": "tsc --build .",
-    "lint": "tslint -c \"../../tslint.json\" -p tsconfig.json",
+    "lint": "eslint -c '../../.eslintrc.json'",
     "clean": "rimraf coverage build tsconfig.tsbuildinfo"
   },
   "bugs": {
