@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+// @ts-ignore
 import * as ts from 'typescript';
 
 const redisClient: string[] = [process.env.REDIS_CLIENT_URL];
@@ -32,6 +33,7 @@ export default class ExportedDefaultClass {
   }
 }
 
+// @ts-ignore
 class NotExportedClass {
   private c: string;
 

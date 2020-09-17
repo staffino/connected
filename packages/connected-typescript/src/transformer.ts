@@ -3,7 +3,6 @@ import { flatten } from 'array-flatten';
 import minimatch from 'minimatch';
 
 type Options = {
-  autoBind?: boolean;
   generateMeta?: boolean;
   pattern?: string|RegExp;
 };
@@ -35,7 +34,7 @@ class Transformer {
 
   constructor(
     private context: ts.TransformationContext,
-    private options: Options = { autoBind: true, generateMeta: true },
+    private options: Options = { generateMeta: true },
   ) {
   }
 
@@ -100,7 +99,7 @@ class Transformer {
     if (ts.isSourceFile(node)) {
       const source = ts.visitEachChild(node, this.visitor, this.context);
       const flattenedStatements = flatten([
-        ...this.generateImports(this.options, this.definitions),
+        ...this.generateImports(),
         ...this.definitions.map(definition => this.generateDefinitions(definition, this.options)),
       ]);
 
@@ -132,10 +131,9 @@ class Transformer {
   /**
    * Generates imports:
    *   import { Client } from '@connected/client';
-   *   import autoBind from '@connected/auto-bind';
    */
-  private generateImports(options: Options, definitions: Definition[]) {
-    const imports = [
+  private generateImports() {
+    return [
       ts.createImportDeclaration(
         undefined,
         undefined,
@@ -145,24 +143,6 @@ class Transformer {
         ),
         ts.createStringLiteral('@connected/client'),
       )];
-
-    if (
-      options.autoBind !== false &&
-      definitions.find(definition => definition.kind === 'class')
-    ) {
-      imports.push(
-        ts.createImportDeclaration(
-          undefined,
-          undefined,
-          ts.createImportClause(
-            ts.createIdentifier('autoBind'),
-            undefined,
-          ),
-          ts.createStringLiteral('@connected/auto-bind'),
-        ));
-    }
-
-    return imports;
   }
 
   generateDefinitions(definition: Definition, options: Options) {
@@ -282,7 +262,7 @@ class Transformer {
         undefined,
         undefined,
         [
-          this.generateClassConstructor(options),
+          this.generateClassConstructor(),
           ...definition.members.map(
             methodName => this.generateClassMethod(definition.name, methodName)),
         ],
@@ -335,9 +315,7 @@ class Transformer {
    *     this.constructorParameters = args;
    *   }
    */
-  private generateClassConstructor(options: Options) {
-    const { module } = this.context.getCompilerOptions();
-
+  private generateClassConstructor() {
     return ts.createConstructor(
       undefined,
       undefined,
@@ -361,24 +339,6 @@ class Transformer {
               ts.createToken(ts.SyntaxKind.EqualsToken),
               ts.createIdentifier('args'),
             )),
-
-          ...(
-            options.autoBind === false ?
-              [] :
-              [
-                ts.createExpressionStatement(
-                  ts.createCall(
-                    module === ts.ModuleKind.CommonJS ?
-                      ts.createPropertyAccess(
-                        ts.createIdentifier('auto_bind_1'),
-                        ts.createIdentifier('default'),
-                      ) :
-                      ts.createIdentifier('autoBind'),
-                    undefined,
-                    [ts.createThis()],
-                  )),
-              ]
-          ),
         ],
         true,
       ),

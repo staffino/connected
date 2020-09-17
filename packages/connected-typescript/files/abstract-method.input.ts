@@ -1,5 +1,3 @@
 export abstract class AbstractMethod {
-  abstract f1() {
-    return 1;
-  }
+  abstract f1(): any;
 }

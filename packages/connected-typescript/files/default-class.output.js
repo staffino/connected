@@ -1,9 +1,7 @@
 import Client from "@connected/client";
-import autoBind from "@connected/auto-bind";
 export default class Named {
     constructor(...args) {
         this.constructorParameters = args;
-        autoBind(this);
     }
     f1(...args) {
         return Client.execute("Named.f1", args, this?.constructorParameters);

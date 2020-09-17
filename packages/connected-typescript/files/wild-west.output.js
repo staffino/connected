@@ -1,9 +1,7 @@
 import Client from "@connected/client";
-import autoBind from "@connected/auto-bind";
 export default class EventEmitterProvider {
     constructor(...args) {
         this.constructorParameters = args;
-        autoBind(this);
     }
     invokeError(...args) {
         return Client.execute("EventEmitterProvider.invokeError", args, this?.constructorParameters);

@@ -1,4 +1,6 @@
-# `@connected/auto-bind`
+# DEPRECATED: `@connected/auto-bind`
+
+Deprecated in favour of commands.
 
 This package automatically binds instance methods to itself.
 It also preserves meta property of such instance method.  
