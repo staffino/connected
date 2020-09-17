@@ -18,13 +18,22 @@ class X {
 
 /* Static types check */
 
-// str() command return type is string
+// str() command return type is string if parameters are used
 const fn0 = () => useInstanceWithCommands(X, '3.14')[1].str()();
 assert<IsExact<ReturnType<typeof fn0>, string>>(true);
 
-// str() instance return type is string
-const fn1 = () => useInstanceWithCommands(X, '3.14')[0].str();
+// str() command return type is string even if no parameters are used
+const fn1 = () => useInstanceWithCommands(X)[1].str()();
 assert<IsExact<ReturnType<typeof fn1>, string>>(true);
+
+
+// str() instance return type is string
+const fn2 = () => useInstanceWithCommands(X, '3.14')[0].str();
+assert<IsExact<ReturnType<typeof fn2>, string>>(true);
+
+// str() instance return type is string even if no parameters are used
+const fn3 = () => useInstanceWithCommands(X)[0].str();
+assert<IsExact<ReturnType<typeof fn3>, string>>(true);
 
 
 const CommandWrapper = ({ hookFn }: { hookFn: Function }) => {
