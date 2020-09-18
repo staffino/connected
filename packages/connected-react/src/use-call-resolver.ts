@@ -4,23 +4,24 @@ import { SerializableValue } from './types';
 import md5 from 'md5';
 import stringify from "fast-json-stable-stringify";
 
-function cacheKeyFn(fn: Function, params: readonly SerializableValue[]) {
-  const { meta, ...functionProperties } = fn as any;
-  if (!meta) {
+function cacheKeyFn(fn: Function, params: readonly SerializableValue[], meta?: any) {
+  const { meta: functionMeta, ...functionProperties } = fn as any;
+  const combinedMeta = functionMeta ?? meta;
+  if (!combinedMeta) {
     console.warn(`Function ${fn.name} has no associated meta. Make sure your transpiler is configured correctly.`);
   }
-  const name = meta?.name ?? fn.name;
+  const name = combinedMeta?.name ?? fn.name;
   return md5(stringify([name, functionProperties, ...params]));
 }
 
 export default function useCallResolver() {
   const { cache, dataTtl, errorTtl } = React.useContext(ConnectedContext);
   return useMemo(
-    () => (fn: Function, args: any[]) => {
+    () => (fn: Function, args: any[], meta?: any) => {
       if (typeof fn !== 'function') {
         throw new TypeError(`${fn} is not a function`);
       }
-      const cacheKey: string = cacheKeyFn(fn, args);
+      const cacheKey: string = cacheKeyFn(fn, args, meta);
       const entry = cache.get(cacheKey);
       if (entry) {
         if (entry.error) {

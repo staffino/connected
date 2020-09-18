@@ -16,7 +16,8 @@ export function buildCommands<
     const existingMethod = anInstance[property];
     if (property !== 'constructor' && typeof existingMethod === 'function') {
       commands[property] = (...parameters: any[]) => {
-        const fn = () => resolver(existingMethod.bind(instance), parameters);
+        const fn = () => resolver(
+          existingMethod.bind(instance), parameters, existingMethod.meta);
         fn.parameters = parameters;
         fn.constructorParameters = constructorParameters;
         fn.meta = existingMethod.meta;
