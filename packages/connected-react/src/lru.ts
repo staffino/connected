@@ -1,11 +1,17 @@
-import { EventEmitter } from 'events';
 import tinyLru, { Lru as TinyLru } from 'tiny-lru';
 
-export default class Lru<T> extends EventEmitter {
+interface EventListener<T> {
+  (action: string, key?: string, value?: T): void;
+}
+
+export default class Lru<T> {
   private readonly lru: TinyLru<T>;
 
-  constructor(initialData?: Record<string, T>, maxSize: number = 500) {
-    super();
+  constructor(
+    initialData?: Record<string, T>,
+    maxSize: number = 500,
+    private readonly eventListener?: EventListener<T>,
+  ) {
     this.lru = tinyLru(maxSize);
     if (initialData) {
       for (const i in initialData) {
@@ -26,20 +32,20 @@ export default class Lru<T> extends EventEmitter {
 
   public set(key: string, value: T): this {
     this.lru.set(key, value);
-    this.emit('set', key, value);
+    this.eventListener?.('set', key, value);
 
     return this;
   }
 
   public clear(): this {
     this.lru.clear();
-    this.emit('clear');
+    this.eventListener?.('clear');
     return this;
   }
 
   public delete(key: string): this {
     this.lru.delete(key);
-    this.emit('delete', key);
+    this.eventListener?.('delete', key);
     return this;
   }
 

@@ -71,8 +71,7 @@ describe('Lru', () => {
 
     it('emits event', () => {
       const handler = jest.fn();
-      const lru = new Lru();
-      lru.on('set', handler);
+      const lru = new Lru({}, 10, handler);
       lru.set('key1', 1);
       lru.set('key2', 2);
       expect(handler).toHaveBeenCalledTimes(2);
