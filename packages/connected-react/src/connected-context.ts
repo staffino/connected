@@ -4,7 +4,7 @@ import { CacheItem, Newable } from './types';
 
 // tslint:disable-next-line:variable-name
 const ConnectedContext = React.createContext({
-  cache: new Lru<CacheItem>(100),
+  cache: new Lru<CacheItem>(undefined, 100),
   dataTtl: 60 * 1000,
   errorTtl: 5 * 1000,
   factory: <T>(klass: Newable<T>, ...args: any[]) => new klass(...args),

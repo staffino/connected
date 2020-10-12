@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { CacheItem, SerializableValue, Newable } from './types';
 import Lru from './lru';
 import ConnectedContext from './connected-context';
@@ -15,7 +15,28 @@ type Props = {
   children?: JSX.Element;
 };
 
-// tslint:disable-next-line:variable-name
+function prepareInitialData(
+  initialData: Record<string, SerializableValue>|undefined,
+  ttl: number): Record<string, CacheItem>|undefined {
+  if (!initialData) {
+    return undefined;
+  }
+  // calculate ttl
+  const t = new Date();
+  t.setMilliseconds(t.getMilliseconds() + ttl);
+
+  const result: Record<string, CacheItem> = {};
+  for (const i in initialData) {
+    if (initialData.hasOwnProperty(i)) {
+      result[i] = {
+        ttl: t,
+        data: initialData[i],
+      }
+    }
+  }
+  return result;
+}
+
 const ConnectedProvider = ({
   maxCacheSize,
   dataTtl,
@@ -34,18 +55,16 @@ const ConnectedProvider = ({
       }
     },
     [onCacheUpdate]);
-  const { current: cache } = useRef(new Lru<CacheItem>(maxCacheSize));
-
-  if (cache.isEmpty() && initialCacheData) {
-    for (const i in initialCacheData) {
-      if (initialCacheData.hasOwnProperty(i)) {
-        cache.set(i, { data: initialCacheData[i] }, dataTtl);
+  const { current: cache } = useRef(
+    new Lru<CacheItem>(prepareInitialData(initialCacheData, dataTtl!), maxCacheSize));
+  useEffect(
+    () => {
+      cache.on('set', handleCacheUpdate);
+      return () => {
+        cache.off('set', handleCacheUpdate);
       }
-    }
-  }
-  if (cache.listenerCount('set') === 0) {
-    cache.on('set', handleCacheUpdate);
-  }
+    },
+    []);
 
   return React.createElement(
     ConnectedContext.Provider,

@@ -80,7 +80,6 @@ const useResultAsyncMethod = () => useResult(useCommands(Provider).asyncMethod()
 assert<IsExact<ReturnType<typeof useResultAsyncMethod>, number>>(true);
 /* =========== Static type tests end =========== */
 
-// tslint:disable-next-line:variable-name
 const Wrapper = ({ hookFn }: { hookFn: Function}) => {
   const data = hookFn();
   return React.createElement(React.Fragment, null, data.toString());

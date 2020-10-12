@@ -2,44 +2,30 @@ import { EventEmitter } from 'events';
 import tinyLru, { Lru as TinyLru } from 'tiny-lru';
 
 export default class Lru<T> extends EventEmitter {
-  private lru: TinyLru<{ value: T; ttl?: Date }>;
+  private readonly lru: TinyLru<T>;
 
-  constructor(maxSize: number = 500) {
+  constructor(initialData?: Record<string, T>, maxSize: number = 500) {
     super();
     this.lru = tinyLru(maxSize);
+    if (initialData) {
+      for (const i in initialData) {
+        if (initialData.hasOwnProperty(i)) {
+          this.set(i, initialData[i]);
+        }
+      }
+    }
   }
 
   public has(key: string): boolean {
-    const entry = this.lru.get(key);
-    if (!entry) {
-      return false;
-    }
-    if (entry.ttl && entry.ttl < new Date()) {
-      this.delete(key);
-      return false;
-    }
-    return true;
+    return !!this.get(key);
   }
 
   public get(key: string): T|undefined {
-    const entry = this.lru.get(key);
-    if (!entry) {
-      return undefined;
-    }
-    if (entry.ttl && entry.ttl < new Date()) {
-      this.delete(key);
-      return undefined;
-    }
-    return entry.value;
+    return this.lru.get(key);
   }
 
-  public set(key: string, value: T, ttl?: number): this {
-    function addMs(milliseconds: number) {
-      const t = new Date();
-      t.setMilliseconds(t.getMilliseconds() + milliseconds);
-      return t;
-    }
-    this.lru.set(key, { value, ttl: ttl ? addMs(ttl) : undefined });
+  public set(key: string, value: T): this {
+    this.lru.set(key, value);
     this.emit('set', key, value);
 
     return this;
@@ -47,11 +33,13 @@ export default class Lru<T> extends EventEmitter {
 
   public clear(): this {
     this.lru.clear();
+    this.emit('clear');
     return this;
   }
 
   public delete(key: string): this {
     this.lru.delete(key);
+    this.emit('delete', key);
     return this;
   }
 

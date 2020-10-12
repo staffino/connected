@@ -9,6 +9,7 @@ export type SerializableFunction =
 export type CacheItem = {
   error?: Error;
   data?: SerializableValue;
+  ttl: Date;
 };
 
 export type Newable<T> = { new(...args: any[]): T };

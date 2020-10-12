@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useReducer } from 'react';
 import ConnectedContext from './connected-context';
 import { SerializableValue } from './types';
 import md5 from 'md5';
@@ -14,8 +14,46 @@ function cacheKeyFn(fn: Function, params: readonly SerializableValue[], meta?: a
   return md5(stringify([name, functionProperties, ...params]));
 }
 
+function addMilliseconds(milliseconds: number, date?: Date) {
+  const t = date ?? new Date();
+  t.setMilliseconds(t.getMilliseconds() + milliseconds);
+  return t;
+}
+
 export default function useCallResolver() {
   const { cache, dataTtl, errorTtl } = React.useContext(ConnectedContext);
+  const [, forceReload] = useReducer(x => x + 1, 0);
+  const tryFetchData = useCallback(
+    (cacheKey, fn, args) => {
+      let result;
+      try {
+        result = fn(...args);
+      } catch (error) {
+        cache.set(
+          cacheKey,
+          { error, ttl: addMilliseconds(errorTtl) });
+        throw error;
+      }
+
+      const entry = cache.get(cacheKey);
+      if (result instanceof Promise) {
+        result
+          .then((data) => {
+            cache.set(cacheKey, { data, ttl: addMilliseconds(dataTtl) });
+          })
+          .catch((error) => {
+            cache.set('cacheKey', { error, ttl: addMilliseconds(errorTtl) });
+          });
+        if (entry?.data !== undefined) {
+          // we are not throwing error, so we need to refresh once we update the data
+          result.finally(forceReload);
+          return entry.data;
+        }
+        throw result;
+      }
+      return result;
+    },
+    [cache, forceReload]);
   return useMemo(
     () => (fn: Function, args: any[], meta?: any) => {
       if (typeof fn !== 'function') {
@@ -25,19 +63,15 @@ export default function useCallResolver() {
       const entry = cache.get(cacheKey);
       if (entry) {
         if (entry.error) {
+          if (entry.ttl < new Date()) {
+            // we need to retry
+            return tryFetchData(cacheKey, fn, args);
+          }
           throw entry.error;
         }
         return entry.data as SerializableValue;
       }
-      const data = fn(...args);
-      if (data instanceof Promise) {
-        throw data.then((data) => {
-          cache.set(cacheKey, { data }, dataTtl);
-        }).catch((error) => {
-          cache.set(cacheKey, { error }, errorTtl);
-        });
-      }
-      return data;
+      return tryFetchData(cacheKey, fn, args);
     },
-    [cache]);
+    [cache, tryFetchData]);
 }
