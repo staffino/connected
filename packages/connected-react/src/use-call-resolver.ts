@@ -42,10 +42,10 @@ export default function useCallResolver() {
             cache.set(cacheKey, { data, ttl: addMilliseconds(dataTtl) });
           })
           .catch((error) => {
-            cache.set('cacheKey', { error, ttl: addMilliseconds(errorTtl) });
+            cache.set(cacheKey, { error, ttl: addMilliseconds(errorTtl) });
           });
         if (entry?.data !== undefined) {
-          // we are not throwing error, so we need to refresh once we update the data
+          // we are not throwing promise, so we need to refresh once we update the data
           result.finally(forceReload);
           return entry.data;
         }
@@ -62,11 +62,10 @@ export default function useCallResolver() {
       const cacheKey: string = cacheKeyFn(fn, args, meta);
       const entry = cache.get(cacheKey);
       if (entry) {
+        if (entry.ttl < new Date()) {
+          return tryFetchData(cacheKey, fn, args);
+        }
         if (entry.error) {
-          if (entry.ttl < new Date()) {
-            // we need to retry
-            return tryFetchData(cacheKey, fn, args);
-          }
           throw entry.error;
         }
         return entry.data as SerializableValue;
