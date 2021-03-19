@@ -50,7 +50,7 @@ const ConnectedProvider = ({
 }: Props) => {
   const handleCacheUpdate = useCallback(
     (action, key, value) => {
-      if (onCacheUpdate && action === 'set' && value.data) {
+      if (onCacheUpdate && action === 'set' && value.hasOwnProperty('data')) {
         onCacheUpdate(key, value.data);
       }
     },
