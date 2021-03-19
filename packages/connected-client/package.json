@@ -39,6 +39,7 @@
     "array-find": "^1.0.0",
     "dataloader": "^1.4.0",
     "jayson": "^3.1.2",
+    "tslib": "^2.1.0",
     "uuid": "^3.3.3"
   },
   "gitHead": "552f610d7d7ab0abe111cafd52eb7af4480231ae"
