@@ -40,5 +40,8 @@
     "glob": "^7.1.6",
     "json-rpc-msg": "^1.1.1"
   },
+  "devDependencies": {
+    "@types/glob": "^7.2.0"
+  },
   "gitHead": "552f610d7d7ab0abe111cafd52eb7af4480231ae"
 }

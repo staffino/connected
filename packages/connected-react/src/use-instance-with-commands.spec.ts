@@ -1,9 +1,13 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react';
 import { mount } from 'enzyme';
+import { assert, IsExact } from 'conditional-type-checks';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
 import useInstanceWithCommands from './use-instance-with-commands';
-import { assert, IsExact } from 'conditional-type-checks';
 
 class X {
   p1: string;

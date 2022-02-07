@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react';
 import { mount } from 'enzyme';
 import { IsExact, assert } from 'conditional-type-checks';
