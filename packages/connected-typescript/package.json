@@ -1,6 +1,6 @@
 {
   "name": "@connected/typescript",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "typescript",
