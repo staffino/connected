@@ -3,7 +3,7 @@ import buildCallableMap from './build-callabale-map';
 
 function createCallableCollection(fn: Function, file?: string, overrideName?: string): Callable[] {
   const name = overrideName || fn.name;
-  const properties = Object.getOwnPropertyNames(fn.prototype)
+  const properties = Object.getOwnPropertyNames(fn.prototype || {})
     .filter(property => property !== 'constructor' && typeof fn.prototype[property] === 'function')
     .map(property => ({ fn, property, file, name }));
 
