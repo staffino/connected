@@ -1,6 +1,6 @@
 {
   "name": "@connected/react",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "client-server",

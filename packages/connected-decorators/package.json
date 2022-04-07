@@ -1,9 +1,10 @@
 {
   "name": "@connected/decorators",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
-    "client-server", "decorators"
+    "client-server",
+    "decorators"
   ],
   "author": "Martin Komara <martin.komara@gmail.com>",
   "homepage": "https://staffino.github.io/connected/",
