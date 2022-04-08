@@ -1,6 +1,6 @@
 {
   "name": "@connected/client",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "client-server"
@@ -36,9 +36,9 @@
     "url": "https://github.com/staffino/connected/issues"
   },
   "dependencies": {
-    "array.prototype.flat": "^1.2.5",
     "array-find": "^1.0.0",
     "array-from": "^2.1.1",
+    "array.prototype.flat": "^1.2.5",
     "dataloader": "^1.4.0",
     "jayson": "^3.1.2",
     "tslib": "^2.1.0",
