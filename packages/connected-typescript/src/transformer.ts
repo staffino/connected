@@ -4,51 +4,102 @@ import minimatch from 'minimatch';
 
 type Options = {
   generateMeta?: boolean;
-  pattern?: string|RegExp;
+  pattern?: string | RegExp;
 };
-
-export default function transform(options?: Options): ts.TransformerFactory<ts.SourceFile> {
-  return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
-    return (sourceFile: ts.SourceFile) => {
-      return new Transformer(context, options).transformSource(sourceFile);
-    };
-  };
-}
 
 type FunctionDefinition = {
   kind: 'function';
   name: string;
   default: boolean;
 };
+type Members = {
+  name: string;
+  group?: string;
+};
 type ClassDefinition = {
   kind: 'class';
   name: string;
   default: boolean;
-  members: string[];
+  members: Members[];
 };
 type Definition = FunctionDefinition | ClassDefinition;
 
-class Transformer {
+function extractMemberGroup(
+  decorators?: ts.NodeArray<ts.Decorator>
+): string | undefined {
+  return (
+    decorators &&
+    decorators
+      .map((decorator) => {
+        if (
+          ts.isCallExpression(decorator.expression) &&
+          ts.isIdentifier(decorator.expression.expression) &&
+          decorator.expression.expression.escapedText === 'group' &&
+          'length' in decorator.expression.arguments &&
+          decorator.expression.arguments.length >= 1 &&
+          ts.isStringLiteral(decorator.expression.arguments[0])
+        ) {
+          return (decorator.expression.arguments[0] as ts.StringLiteral).text;
+        }
+        return undefined;
+      })
+      .find((group) => !!group)
+  );
+}
 
+function extractMembers(members: ts.NodeArray<ts.ClassElement>): Members[] {
+  return members
+    .filter((member) => ts.isMethodDeclaration(member))
+    .filter((method) => {
+      const modifiers =
+        method.modifiers?.map((modifier) => modifier.kind) ?? [];
+      return (
+        modifiers.indexOf(ts.SyntaxKind.StaticKeyword) === -1 &&
+        modifiers.indexOf(ts.SyntaxKind.AbstractKeyword) === -1 &&
+        modifiers.indexOf(ts.SyntaxKind.PrivateKeyword) === -1
+      );
+    })
+    .map((method) => {
+      // method.decorators.
+      if (method.name && 'text' in method.name) {
+        return {
+          name: method.name?.text ?? '',
+          group: extractMemberGroup(method.decorators),
+        };
+      }
+      return { name: '' };
+    })
+    .filter(({ name }) => name.length > 0);
+}
+
+class Transformer {
   private definitions: Definition[] = [];
 
+  readonly f: ts.NodeFactory;
+
   constructor(
-    private context: ts.TransformationContext,
-    private options: Options = { generateMeta: true },
+    private readonly context: ts.TransformationContext,
+    // eslint-disable-next-line no-unused-vars
+    private readonly options: Options = { generateMeta: true }
   ) {
+    this.f = context.factory;
   }
 
   transformSource(sourceFile: ts.SourceFile) {
     if (this.options.pattern) {
-      if (typeof this.options.pattern === 'string' &&
-        !minimatch(sourceFile.fileName, this.options.pattern, { matchBase: true })) {
-
+      if (
+        typeof this.options.pattern === 'string' &&
+        !minimatch(sourceFile.fileName, this.options.pattern, {
+          matchBase: true,
+        })
+      ) {
         return sourceFile;
       }
-      if (typeof this.options.pattern === 'object' &&
+      if (
+        typeof this.options.pattern === 'object' &&
         'test' in this.options.pattern &&
-        !this.options.pattern.test(sourceFile.fileName)) {
-
+        !this.options.pattern.test(sourceFile.fileName)
+      ) {
         return sourceFile;
       }
     }
@@ -57,7 +108,7 @@ class Transformer {
 
   visitor = (node: ts.Node): ts.Node => {
     if (ts.isClassDeclaration(node)) {
-      const modifiers = node.modifiers?.map(modifier => modifier.kind) ?? [];
+      const modifiers = node.modifiers?.map((modifier) => modifier.kind) ?? [];
       const exported = modifiers.indexOf(ts.SyntaxKind.ExportKeyword) !== -1;
       const isDefault = modifiers.indexOf(ts.SyntaxKind.DefaultKeyword) !== -1;
 
@@ -66,20 +117,22 @@ class Transformer {
         console.warn('Default class has no name.');
       }
 
-      if (node.name?.text &&
+      if (
+        node.name?.text &&
         exported &&
-        modifiers.indexOf(ts.SyntaxKind.AbstractKeyword) === -1) {
+        modifiers.indexOf(ts.SyntaxKind.AbstractKeyword) === -1
+      ) {
         const definition: ClassDefinition = {
           kind: 'class',
           name: node.name?.text,
           default: isDefault,
-          members: this.extractMembers(node.members),
+          members: extractMembers(node.members),
         };
         this.definitions.push(definition);
       }
     }
     if (ts.isFunctionDeclaration(node)) {
-      const modifiers = node.modifiers?.map(modifier => modifier.kind) ?? [];
+      const modifiers = node.modifiers?.map((modifier) => modifier.kind) ?? [];
       const exported = modifiers.indexOf(ts.SyntaxKind.ExportKeyword) !== -1;
       const isDefault = modifiers.indexOf(ts.SyntaxKind.DefaultKeyword) !== -1;
 
@@ -100,33 +153,22 @@ class Transformer {
       const source = ts.visitEachChild(node, this.visitor, this.context);
       const flattenedStatements = flatten([
         ...this.generateImports(),
-        ...this.definitions.map(definition => this.generateDefinitions(definition, this.options)),
+        ...this.definitions.map((definition) =>
+          this.generateDefinitions(definition, this.options)
+        ),
       ]);
 
-      return ts.updateSourceFileNode(
+      return this.f.updateSourceFile(
         source,
-        ts.setTextRange(ts.createNodeArray(flattenedStatements), source.statements),
+        ts.setTextRange(
+          this.f.createNodeArray(flattenedStatements),
+          source.statements
+        )
       );
     }
 
     return node;
-  }
-
-  private extractMembers(members: ts.NodeArray<ts.ClassElement>): string[] {
-    return members
-      .filter(member => ts.isMethodDeclaration(member))
-      .filter((method) => {
-        const modifiers = method.modifiers?.map(modifier => modifier.kind) ?? [];
-        return modifiers.indexOf(ts.SyntaxKind.StaticKeyword) === -1 &&
-          modifiers.indexOf(ts.SyntaxKind.AbstractKeyword) === -1 &&
-          modifiers.indexOf(ts.SyntaxKind.PrivateKeyword) === -1;
-      }).map((method) => {
-        if (method.name && 'text' in method.name) {
-          return method.name?.text ?? '';
-        }
-        return '';
-      }).filter(name => name.length > 0);
-  }
+  };
 
   /**
    * Generates imports:
@@ -134,15 +176,17 @@ class Transformer {
    */
   private generateImports() {
     return [
-      ts.createImportDeclaration(
+      this.f.createImportDeclaration(
         undefined,
         undefined,
-        ts.createImportClause(
-          ts.createIdentifier('Client'),
-          undefined,
+        this.f.createImportClause(
+          false,
+          this.f.createIdentifier('Client'),
+          undefined
         ),
-        ts.createStringLiteral('@connected/client'),
-      )];
+        this.f.createStringLiteral('@connected/client')
+      ),
+    ];
   }
 
   generateDefinitions(definition: Definition, options: Options) {
@@ -164,82 +208,98 @@ class Transformer {
    *     return Client.execute('functionName', args);
    *   }
    */
-  private generateFunctionDefinition(definition: FunctionDefinition, options: Options) {
+  private generateFunctionDefinition(
+    definition: FunctionDefinition,
+    options: Options
+  ) {
     const { module } = this.context.getCompilerOptions();
 
-    const modifiers: ts.Modifier[] = [ts.createModifier(ts.SyntaxKind.ExportKeyword)];
+    const modifiers: ts.Modifier[] = [
+      this.f.createModifier(ts.SyntaxKind.ExportKeyword),
+    ];
     if (definition.default) {
-      modifiers.push(ts.createModifier(ts.SyntaxKind.DefaultKeyword));
+      modifiers.push(this.f.createModifier(ts.SyntaxKind.DefaultKeyword));
     }
 
     const definitions: ts.Statement[] = [
-      ts.createFunctionDeclaration(
+      this.f.createFunctionDeclaration(
         undefined,
         modifiers,
         undefined,
-        ts.createIdentifier(definition.name),
+        this.f.createIdentifier(definition.name),
         undefined,
-        [ts.createParameter(
-          undefined,
-          undefined,
-          ts.createToken(ts.SyntaxKind.DotDotDotToken),
-          ts.createIdentifier('args'),
-          undefined,
-          undefined,
-          undefined,
-        )],
+        [
+          this.f.createParameterDeclaration(
+            undefined,
+            undefined,
+            this.f.createToken(ts.SyntaxKind.DotDotDotToken),
+            this.f.createIdentifier('args'),
+            undefined,
+            undefined,
+            undefined
+          ),
+        ],
         undefined,
         // function body
-        ts.createBlock(
-          [ts.createReturn(
-            ts.createCall(
-              ts.createPropertyAccess(
-                module === ts.ModuleKind.CommonJS ?
-                  ts.createPropertyAccess(
-                    ts.createIdentifier('client_1'),
-                    ts.createIdentifier('default'),
-                  ) :
-                  ts.createIdentifier('Client'),
-                ts.createIdentifier('execute'),
-              ),
-              undefined,
-              [
-                ts.createStringLiteral(definition.name),
-                ts.createIdentifier('args'),
-              ],
+        this.f.createBlock(
+          [
+            this.f.createReturnStatement(
+              this.f.createCallExpression(
+                this.f.createPropertyAccessExpression(
+                  module === ts.ModuleKind.CommonJS
+                    ? this.f.createPropertyAccessExpression(
+                        this.f.createIdentifier('client_1'),
+                        this.f.createIdentifier('default')
+                      )
+                    : this.f.createIdentifier('Client'),
+                  this.f.createIdentifier('execute')
+                ),
+                undefined,
+                [
+                  this.f.createStringLiteral(definition.name),
+                  this.f.createIdentifier('args'),
+                ]
+              )
             ),
-          ),
           ],
-          true,
-        )),
+          true
+        )
+      ),
     ];
 
     if (options.generateMeta !== false) {
       definitions.push(
-        ts.createExpressionStatement(ts.createCall(
-          ts.createPropertyAccess(
-            ts.createIdentifier('Object'),
-            ts.createIdentifier('defineProperty'),
-          ),
-          undefined,
-          [
-            ts.createIdentifier(definition.name),
-            ts.createStringLiteral('meta'),
-            ts.createObjectLiteral(
-              [ts.createPropertyAssignment(
-                ts.createIdentifier('value'),
-                ts.createObjectLiteral(
-                  [ts.createPropertyAssignment(
-                    ts.createIdentifier('name'),
-                    ts.createStringLiteral(definition.name),
-                  )],
-                  false,
-                ),
-              )],
-              false,
+        this.f.createExpressionStatement(
+          this.f.createCallExpression(
+            this.f.createPropertyAccessExpression(
+              this.f.createIdentifier('Object'),
+              this.f.createIdentifier('defineProperty')
             ),
-          ],
-        )));
+            undefined,
+            [
+              this.f.createIdentifier(definition.name),
+              this.f.createStringLiteral('meta'),
+              this.f.createObjectLiteralExpression(
+                [
+                  this.f.createPropertyAssignment(
+                    this.f.createIdentifier('value'),
+                    this.f.createObjectLiteralExpression(
+                      [
+                        this.f.createPropertyAssignment(
+                          this.f.createIdentifier('name'),
+                          this.f.createStringLiteral(definition.name)
+                        ),
+                      ],
+                      false
+                    )
+                  ),
+                ],
+                false
+              ),
+            ]
+          )
+        )
+      );
     }
 
     return definitions;
@@ -248,61 +308,82 @@ class Transformer {
   generateClassDefinition(definition: ClassDefinition, options: Options) {
     const statements: ts.Statement[] = [];
 
-    const modifiers: ts.Modifier[] = [ts.createModifier(ts.SyntaxKind.ExportKeyword)];
+    const modifiers: ts.Modifier[] = [
+      this.f.createModifier(ts.SyntaxKind.ExportKeyword),
+    ];
     if (definition.default) {
-      modifiers.push(ts.createModifier(ts.SyntaxKind.DefaultKeyword));
+      modifiers.push(this.f.createModifier(ts.SyntaxKind.DefaultKeyword));
     }
 
     // 1. generate class declaration
     statements.push(
-      ts.createClassDeclaration(
+      this.f.createClassDeclaration(
         undefined,
         modifiers,
-        ts.createIdentifier(definition.name),
+        this.f.createIdentifier(definition.name),
         undefined,
         undefined,
         [
           this.generateClassConstructor(),
-          ...definition.members.map(
-            methodName => this.generateClassMethod(definition.name, methodName)),
-        ],
-      ));
+          ...definition.members.map(({ name }) =>
+            this.generateClassMethod(definition.name, name)
+          ),
+        ]
+      )
+    );
 
     // 2. generate metadata
     if (options.generateMeta !== false) {
       for (let i = 0; i < definition.members.length; i += 1) {
-        const methodName = definition.members[i];
+        const member = definition.members[i];
         statements.push(
-          ts.createExpressionStatement(ts.createCall(
-            ts.createPropertyAccess(
-              ts.createIdentifier('Object'),
-              ts.createIdentifier('defineProperty'),
-            ),
-            undefined,
-            [
-              ts.createPropertyAccess(
-                ts.createPropertyAccess(
-                  ts.createIdentifier(definition.name),
-                  ts.createIdentifier('prototype'),
-                ),
-                ts.createIdentifier(methodName),
+          this.f.createExpressionStatement(
+            this.f.createCallExpression(
+              this.f.createPropertyAccessExpression(
+                this.f.createIdentifier('Object'),
+                this.f.createIdentifier('defineProperty')
               ),
-              ts.createStringLiteral('meta'),
-              ts.createObjectLiteral(
-                [ts.createPropertyAssignment(
-                  ts.createIdentifier('value'),
-                  ts.createObjectLiteral(
-                    [ts.createPropertyAssignment(
-                      ts.createIdentifier('name'),
-                      ts.createStringLiteral(`${definition.name}.${methodName}`),
-                    )],
-                    false,
+              undefined,
+              [
+                this.f.createPropertyAccessExpression(
+                  this.f.createPropertyAccessExpression(
+                    this.f.createIdentifier(definition.name),
+                    this.f.createIdentifier('prototype')
                   ),
-                )],
-                false,
-              ),
-            ],
-          )));
+                  this.f.createIdentifier(member.name)
+                ),
+                this.f.createStringLiteral('meta'),
+                this.f.createObjectLiteralExpression(
+                  [
+                    this.f.createPropertyAssignment(
+                      this.f.createIdentifier('value'),
+                      this.f.createObjectLiteralExpression(
+                        [
+                          this.f.createPropertyAssignment(
+                            this.f.createIdentifier('name'),
+                            this.f.createStringLiteral(
+                              `${definition.name}.${member.name}`
+                            )
+                          ),
+                          ...(member.group
+                            ? [
+                                this.f.createPropertyAssignment(
+                                  this.f.createIdentifier('group'),
+                                  this.f.createStringLiteral(member.group)
+                                ),
+                              ]
+                            : []),
+                        ],
+                        false
+                      )
+                    ),
+                  ],
+                  false
+                ),
+              ]
+            )
+          )
+        );
       }
     }
 
@@ -316,32 +397,35 @@ class Transformer {
    *   }
    */
   private generateClassConstructor() {
-    return ts.createConstructor(
+    return this.f.createConstructorDeclaration(
       undefined,
       undefined,
-      [ts.createParameter(
-        undefined,
-        undefined,
-        ts.createToken(ts.SyntaxKind.DotDotDotToken),
-        ts.createIdentifier('args'),
-        undefined,
-        undefined,
-        undefined,
-      )],
-      ts.createBlock(
+      [
+        this.f.createParameterDeclaration(
+          undefined,
+          undefined,
+          this.f.createToken(ts.SyntaxKind.DotDotDotToken),
+          this.f.createIdentifier('args'),
+          undefined,
+          undefined,
+          undefined
+        ),
+      ],
+      this.f.createBlock(
         [
-          ts.createExpressionStatement(
-            ts.createBinary(
-              ts.createPropertyAccess(
-                ts.createThis(),
-                ts.createIdentifier('constructorParameters'),
+          this.f.createExpressionStatement(
+            this.f.createBinaryExpression(
+              this.f.createPropertyAccessExpression(
+                this.f.createThis(),
+                this.f.createIdentifier('constructorParameters')
               ),
-              ts.createToken(ts.SyntaxKind.EqualsToken),
-              ts.createIdentifier('args'),
-            )),
+              this.f.createToken(ts.SyntaxKind.EqualsToken),
+              this.f.createIdentifier('args')
+            )
+          ),
         ],
-        true,
-      ),
+        true
+      )
     );
   }
 
@@ -354,47 +438,61 @@ class Transformer {
   private generateClassMethod(className: string, methodName: string) {
     const { module } = this.context.getCompilerOptions();
 
-    return ts.createMethod(
+    return this.f.createMethodDeclaration(
       undefined,
       undefined,
       undefined,
-      ts.createIdentifier(methodName),
+      this.f.createIdentifier(methodName),
       undefined,
       undefined,
-      [ts.createParameter(
-        undefined,
-        undefined,
-        ts.createToken(ts.SyntaxKind.DotDotDotToken),
-        ts.createIdentifier('args'),
-        undefined,
-        undefined,
-        undefined,
-      )],
-      undefined,
-      ts.createBlock(
-        [ts.createReturn(ts.createCall(
-          ts.createPropertyAccess(
-            module === ts.ModuleKind.CommonJS ?
-              ts.createPropertyAccess(
-                ts.createIdentifier('client_1'),
-                ts.createIdentifier('default'),
-              ) :
-              ts.createIdentifier('Client'),
-            ts.createIdentifier('execute'),
-          ),
+      [
+        this.f.createParameterDeclaration(
           undefined,
-          [
-            ts.createStringLiteral(`${className}.${methodName}`),
-            ts.createIdentifier('args'),
-            ts.createPropertyAccessChain(
-              ts.createThis(),
-              ts.createToken(ts.SyntaxKind.QuestionDotToken),
-              ts.createIdentifier('constructorParameters'),
-            ),
-          ],
-        ))],
-        true,
-      ),
+          undefined,
+          this.f.createToken(ts.SyntaxKind.DotDotDotToken),
+          this.f.createIdentifier('args'),
+          undefined,
+          undefined,
+          undefined
+        ),
+      ],
+      undefined,
+      this.f.createBlock(
+        [
+          this.f.createReturnStatement(
+            this.f.createCallExpression(
+              this.f.createPropertyAccessExpression(
+                module === ts.ModuleKind.CommonJS
+                  ? this.f.createPropertyAccessExpression(
+                      this.f.createIdentifier('client_1'),
+                      this.f.createIdentifier('default')
+                    )
+                  : this.f.createIdentifier('Client'),
+                this.f.createIdentifier('execute')
+              ),
+              undefined,
+              [
+                this.f.createStringLiteral(`${className}.${methodName}`),
+                this.f.createIdentifier('args'),
+                this.f.createPropertyAccessChain(
+                  this.f.createThis(),
+                  this.f.createToken(ts.SyntaxKind.QuestionDotToken),
+                  this.f.createIdentifier('constructorParameters')
+                ),
+              ]
+            )
+          ),
+        ],
+        true
+      )
     );
   }
+}
+
+export default function transform(
+  options?: Options
+): ts.TransformerFactory<ts.SourceFile> {
+  return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> =>
+    (sourceFile: ts.SourceFile) =>
+      new Transformer(context, options).transformSource(sourceFile);
 }

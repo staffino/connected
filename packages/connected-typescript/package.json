@@ -36,8 +36,10 @@
     "url": "https://github.com/staffino/connected/issues"
   },
   "dependencies": {
+    "@connected/decorators": "file:../connected-decorators",
     "array-flatten": "^3.0.0",
-    "minimatch": "^3.0.4"
+    "minimatch": "^3.0.4",
+    "typescript": "^4"
   },
   "gitHead": "552f610d7d7ab0abe111cafd52eb7af4480231ae"
 }
