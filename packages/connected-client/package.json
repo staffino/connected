@@ -1,6 +1,6 @@
 {
   "name": "@connected/client",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "client-server"
@@ -44,5 +44,5 @@
     "tslib": "^2.1.0",
     "uuid": "^3.3.3"
   },
-  "gitHead": "8df7b87d990417a08bb13a5657f250a4d9617e66"
+  "gitHead": "719dfce9c8b37c02a9eebbdfbded1daddd4a0c65"
 }
