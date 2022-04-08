@@ -1,6 +1,6 @@
 {
   "name": "@connected/server",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "description": "A server middleware to process function calls from the client side.",
   "keywords": [
     "rpc",
@@ -43,5 +43,5 @@
   "devDependencies": {
     "@types/glob": "^7.2.0"
   },
-  "gitHead": "b5830ee3437aad3cb09c2361f7f23ca81134bbc9"
+  "gitHead": "8df7b87d990417a08bb13a5657f250a4d9617e66"
 }
