@@ -1,6 +1,6 @@
 {
   "name": "@connected/typescript",
-  "version": "0.0.35",
+  "version": "0.0.36",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "typescript",
@@ -36,7 +36,7 @@
     "url": "https://github.com/staffino/connected/issues"
   },
   "dependencies": {
-    "@connected/decorators": "^0.0.35",
+    "@connected/decorators": "^0.0.36",
     "array-flatten": "^3.0.0",
     "minimatch": "^3.0.4",
     "typescript": "^4"
