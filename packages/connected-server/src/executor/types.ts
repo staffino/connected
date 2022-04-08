@@ -1,12 +1,12 @@
 import { SerializableValue } from '../types';
 
-type Newable<T> = { new(...args: any[]): T };
+type Newable<T> = { new (...args: any[]): T };
 
 export interface IExecutor {
   execute(
     name: string,
     parameters: SerializableValue[],
-    constructorParameters?: SerializableValue[],
+    constructorParameters?: SerializableValue[]
   ): Promise<SerializableValue>;
 }
 
@@ -14,7 +14,7 @@ export interface ExecutorOptions {
   factory?<T>(klass: Newable<T>, ...args: any[]): T;
 }
 
-export interface ExecutorBuilderOptions extends ExecutorOptions{
+export interface ExecutorBuilderOptions extends ExecutorOptions {
   createMeta?: boolean;
 }
 
