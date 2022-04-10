@@ -325,8 +325,8 @@ class Transformer {
         undefined,
         [
           this.generateClassConstructor(),
-          ...definition.members.map(({ name }) =>
-            this.generateClassMethod(definition.name, name)
+          ...definition.members.map(({ name, group }) =>
+            this.generateClassMethod(definition.name, name, group)
           ),
         ]
       )
@@ -435,7 +435,11 @@ class Transformer {
    *     return Client.execute('ClassName.methodName', args, this?.constructorParameters);
    *   }
    */
-  private generateClassMethod(className: string, methodName: string) {
+  private generateClassMethod(
+    className: string,
+    methodName: string,
+    group?: string
+  ) {
     const { module } = this.context.getCompilerOptions();
 
     return this.f.createMethodDeclaration(
@@ -479,7 +483,10 @@ class Transformer {
                   this.f.createToken(ts.SyntaxKind.QuestionDotToken),
                   this.f.createIdentifier('constructorParameters')
                 ),
-              ]
+                group
+                  ? this.f.createStringLiteral(group)
+                  : (undefined as unknown as ts.Expression),
+              ].filter(Boolean)
             )
           ),
         ],

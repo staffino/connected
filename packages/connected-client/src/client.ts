@@ -62,8 +62,14 @@ export default class Client {
   public static execute(
     name: string,
     parameters: SerializableValue[],
-    constructorParameters?: SerializableValue[]
+    constructorParameters?: SerializableValue[],
+    group?: string
   ) {
-    return Client.instance.execute(name, parameters, constructorParameters);
+    return Client.instance.execute(
+      name,
+      parameters,
+      constructorParameters,
+      group
+    );
   }
 }
