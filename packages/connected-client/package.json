@@ -37,8 +37,6 @@
   },
   "dependencies": {
     "array-find": "^1.0.0",
-    "array-from": "^2.1.1",
-    "array.prototype.flat": "^1.2.5",
     "dataloader": "^1.4.0",
     "jayson": "^3.1.2",
     "tslib": "^2.1.0",

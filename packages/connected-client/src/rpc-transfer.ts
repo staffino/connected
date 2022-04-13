@@ -5,14 +5,11 @@
  * Created by Martin Komara, September 2019
  */
 import find from 'array-find';
-import arrayFrom from 'array-from';
-import arrayFlat from 'array.prototype.flat';
 import uuid from 'uuid/v4';
 import DataLoader from 'dataloader';
 import JaysonBrowserClient from 'jayson/lib/client/browser';
 import type {
   JSONRPCErrorLike,
-  JSONRPCIDLike,
   JSONRPCRequest,
   JSONRPCResultLike,
 } from 'jayson';
@@ -22,7 +19,6 @@ import RpcError from './rpc-error';
 type CallRequest = {
   id: string;
   procName: string;
-  group?: string;
   params: Record<string, unknown>;
 };
 
@@ -48,7 +44,10 @@ function calculateClientResponse(
 export default class RpcTransfer {
   private readonly rpcClient: JaysonBrowserClient;
 
-  private readonly dataLoader: DataLoader<CallRequest, JSONRPCResultLike>;
+  private readonly dataLoaderMap = new Map<
+    string,
+    DataLoader<CallRequest, JSONRPCResultLike>
+  >();
 
   constructor(urlOrOptions?: string | RpcTransferOptions) {
     let url = '/rpc';
@@ -77,11 +76,18 @@ export default class RpcTransfer {
     }
 
     this.rpcClient = new JaysonBrowserClient(serverRequester, {});
+  }
 
-    this.dataLoader = new DataLoader<object, JSONRPCResultLike>(
-      this.batchRequest.bind(this),
+  findDataLoader(group = 'default') {
+    if (this.dataLoaderMap.has(group)) {
+      return this.dataLoaderMap.get(group);
+    }
+    const dataLoader = new DataLoader<object, JSONRPCResultLike>(
+      (requests: JSONRPCRequest[]) => this.batchRequest(requests),
       { cacheKeyFn: (key) => key.id }
     );
+    this.dataLoaderMap.set(group, dataLoader);
+    return dataLoader;
   }
 
   request(
@@ -89,30 +95,16 @@ export default class RpcTransfer {
     params: Record<string, unknown>,
     group?: string
   ): Promise<SerializableValue> {
-    return this.dataLoader.load({ procName, group, params, id: uuid() });
-  }
-
-  private buildRequestGroups(requests: CallRequest[]): Array<JSONRPCRequest[]> {
-    const groups = new Map<string, JSONRPCRequest[]>();
-    requests.forEach((request) => {
-      const group = request.group || 'default';
-      const rpcRequest = this.rpcClient.request(
-        request.procName,
-        request.params,
-        request.id
-      );
-      if (groups.has(group)) {
-        groups.get(group)?.push(rpcRequest);
-      } else {
-        groups.set(group, [rpcRequest]);
-      }
+    return this.findDataLoader(group)!.load({
+      procName,
+      params,
+      id: uuid(),
     });
-    return arrayFrom(groups.values());
   }
 
-  private callRpcMethod(
+  private batchRequest(
     requests: JSONRPCRequest[]
-  ): Promise<Array<[JSONRPCIDLike, Error | JSONRPCResultLike]>> {
+  ): Promise<(SerializableValue | Error)[]> {
     return new Promise((resolve) => {
       const callback = calculateClientResponse.bind(null, resolve);
       this.rpcClient.request(requests, callback);
@@ -127,7 +119,7 @@ export default class RpcTransfer {
         successes: JSONRPCResultLike[];
       }) => {
         if (err) {
-          return requests.map((request) => [request.id!, err]);
+          return requests.map(() => err);
         }
         return requests.map((request) => {
           // check in errors first
@@ -136,28 +128,18 @@ export default class RpcTransfer {
             (error) => !!error && (error as any).id === request.id
           );
           if (errorResult) {
-            return [request.id!, new RpcError(errorResult.error)];
+            return new RpcError(errorResult.error);
           }
           const success = find(successes, (s) => !!s && s.id === request.id);
           if (success) {
-            return [request.id!, success.result];
+            return success.result;
           }
 
           // neither success nor error was found - this may happen if invalid
           // id is provided, throw an error
-          return [request.id!, new Error('Message id missing in the response')];
+          return new Error('Message id missing in the response');
         });
       }
     );
-  }
-
-  private batchRequest(
-    requests: CallRequest[]
-  ): Promise<(SerializableValue | Error)[]> {
-    const requestGroups = this.buildRequestGroups(requests);
-    return Promise.all(requestGroups.map((rs) => this.callRpcMethod(rs)))
-      .then((groups) => arrayFlat(groups, 1))
-      .then((entries) => new Map(entries))
-      .then((map) => requests.map(({ id }) => map.get(id)));
   }
 }
