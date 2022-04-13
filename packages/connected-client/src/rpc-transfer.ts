@@ -16,12 +16,6 @@ import type {
 import { SerializableValue } from './types';
 import RpcError from './rpc-error';
 
-type CallRequest = {
-  id: string;
-  procName: string;
-  params: Record<string, unknown>;
-};
-
 export type RpcTransferOptions = {
   url?: string;
 };
@@ -46,7 +40,7 @@ export default class RpcTransfer {
 
   private readonly dataLoaderMap = new Map<
     string,
-    DataLoader<CallRequest, JSONRPCResultLike>
+    DataLoader<JSONRPCRequest, JSONRPCResultLike>
   >();
 
   constructor(urlOrOptions?: string | RpcTransferOptions) {
@@ -95,11 +89,9 @@ export default class RpcTransfer {
     params: Record<string, unknown>,
     group?: string
   ): Promise<SerializableValue> {
-    return this.findDataLoader(group)!.load({
-      procName,
-      params,
-      id: uuid(),
-    });
+    return this.findDataLoader(group)!.load(
+      this.rpcClient.request(procName, params, uuid())
+    );
   }
 
   private batchRequest(
