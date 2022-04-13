@@ -1,6 +1,6 @@
 {
   "name": "@connected/client",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "client-server"
