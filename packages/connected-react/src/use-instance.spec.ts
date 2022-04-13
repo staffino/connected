@@ -9,8 +9,7 @@ import useInstance from './use-instance';
 import ConnectedProvider from './connected-provider';
 
 class X {
-  constructor(a1: string) {
-  }
+  constructor(_a1: string) {}
 
   str() {
     return '42';
@@ -18,34 +17,38 @@ class X {
 }
 
 class Y {
-  constructor() {
-  }
+  constructor() {}
 
   str() {
     return '3.14';
   }
 }
 
-const Wrapper = ({ hookFn }: { hookFn: Function }) => {
+function Wrapper({ hookFn }: { hookFn: Function }) {
   const data = hookFn();
   return React.createElement(React.Fragment, null, data.str());
-};
-const CustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
+}
+function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
   return React.createElement(
     ConnectedProvider,
-    { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass() },
-    React.createElement(Wrapper, { hookFn }),
+    { factory: <T>(klass: Newable<T>, ..._args: any[]) => new klass() },
+    React.createElement(Wrapper, { hookFn })
   );
-};
+}
 describe('useInstance', () => {
   it('creates an instance of a class', () => {
-    const wrapper = mount(React.createElement(Wrapper, { hookFn: () => useInstance(X) }));
+    const wrapper = mount(
+      React.createElement(Wrapper, { hookFn: () => useInstance(X) })
+    );
     expect(wrapper.text()).toBe('42');
   });
 
   it('creates an instance using custom factory', () => {
-    const wrapper = mount(React.createElement(
-      CustomFactoryWrapper, { hookFn: () => useInstance(Y) }));
+    const wrapper = mount(
+      React.createElement(CustomFactoryWrapper, {
+        hookFn: () => useInstance(Y),
+      })
+    );
     expect(wrapper.text()).toBe('3.14');
   });
 });

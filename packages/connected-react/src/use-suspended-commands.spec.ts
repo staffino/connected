@@ -12,8 +12,7 @@ import useSuspendedCommands from './use-suspended-commands';
 class X {
   p1: string;
 
-  constructor(private a1: string) {
-  }
+  constructor(private a1: string) {}
 
   str() {
     return this.a1 ?? '42';
@@ -42,28 +41,34 @@ assert<IsExact<ReturnType<typeof useCommands2>, string>>(true);
 const useCommands3 = () => useSuspendedCommands(X).str()();
 assert<IsExact<ReturnType<typeof useCommands3>, string>>(true);
 
-const Wrapper = ({ hookFn }: { hookFn: Function }) => {
+function Wrapper({ hookFn }: { hookFn: Function }) {
   const data = hookFn();
   const command = data.str();
   return React.createElement(React.Fragment, null, command());
-};
-const CustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
+}
+function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
   return React.createElement(
     ConnectedProvider,
-    { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass('pi') },
-    React.createElement(Wrapper, { hookFn }),
+    { factory: <T>(klass: Newable<T>, ..._args: any[]) => new klass('pi') },
+    React.createElement(Wrapper, { hookFn })
   );
-};
+}
 describe('useSuspendedCommands', () => {
   it('creates a command object', () => {
     const wrapper = mount(
-      React.createElement(Wrapper, { hookFn: () => useSuspendedCommands(X, '3.14') }));
+      React.createElement(Wrapper, {
+        hookFn: () => useSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(wrapper.text()).toBe('3.14');
   });
 
   it('creates a command object using factory', () => {
-    const wrapper = mount(React.createElement(
-      CustomFactoryWrapper, { hookFn: () => useSuspendedCommands(X, '3.14') }));
+    const wrapper = mount(
+      React.createElement(CustomFactoryWrapper, {
+        hookFn: () => useSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(wrapper.text()).toBe('pi');
   });
 });

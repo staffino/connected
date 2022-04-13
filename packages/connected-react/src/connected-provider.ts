@@ -16,8 +16,9 @@ type Props = {
 };
 
 function prepareInitialData(
-  initialData: Record<string, SerializableValue>|undefined,
-  ttl: number): Record<string, CacheItem>|undefined {
+  initialData: Record<string, SerializableValue> | undefined,
+  ttl: number
+): Record<string, CacheItem> | undefined {
   if (!initialData) {
     return undefined;
   }
@@ -26,18 +27,17 @@ function prepareInitialData(
   t.setMilliseconds(t.getMilliseconds() + ttl);
 
   const result: Record<string, CacheItem> = {};
-  for (const i in initialData) {
-    if (initialData.hasOwnProperty(i)) {
-      result[i] = {
-        ttl: t,
-        data: initialData[i],
-      }
-    }
-  }
+  const keys = Object.keys(initialData);
+  keys.forEach((key) => {
+    result[key] = {
+      ttl: t,
+      data: initialData[key],
+    };
+  });
   return result;
 }
 
-const ConnectedProvider = ({
+function ConnectedProvider({
   maxCacheSize,
   dataTtl,
   errorTtl,
@@ -47,19 +47,22 @@ const ConnectedProvider = ({
   onCacheUpdate,
 
   children,
-}: Props) => {
+}: Props) {
   const handleCacheUpdate = useCallback(
     (action, key, value) => {
-      if (onCacheUpdate && action === 'set' && value.hasOwnProperty('data')) {
+      if (onCacheUpdate && action === 'set' && 'data' in value) {
         onCacheUpdate(key, value.data);
       }
     },
-    [onCacheUpdate]);
+    [onCacheUpdate]
+  );
   const { current: cache } = useRef(
     new Lru<CacheItem>(
       prepareInitialData(initialCacheData, dataTtl!),
       maxCacheSize,
-      handleCacheUpdate));
+      handleCacheUpdate
+    )
+  );
 
   return React.createElement(
     ConnectedContext.Provider,
@@ -69,10 +72,11 @@ const ConnectedProvider = ({
         dataTtl: dataTtl!,
         errorTtl: errorTtl!,
         factory: factory!,
-      } },
-    children,
+      },
+    },
+    children
   );
-};
+}
 
 ConnectedProvider.defaultProps = {
   maxCacheSize: 500,
@@ -80,7 +84,10 @@ ConnectedProvider.defaultProps = {
   errorTtl: 5 * 1000,
 
   initialCacheData: {},
+  // eslint-disable-next-line new-cap
   factory: <T>(klass: Newable<T>, ...args: any[]) => new klass(args),
+  onCacheUpdate: undefined,
+  children: undefined,
 };
 
 export default ConnectedProvider;

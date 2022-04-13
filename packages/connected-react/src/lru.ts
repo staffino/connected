@@ -9,16 +9,15 @@ export default class Lru<T> {
 
   constructor(
     initialData?: Record<string, T>,
-    maxSize: number = 500,
-    private readonly eventListener?: EventListener<T>,
+    maxSize?: number,
+    private readonly eventListener?: EventListener<T>
   ) {
-    this.lru = tinyLru(maxSize);
+    this.lru = tinyLru(maxSize || 500);
     if (initialData) {
-      for (const i in initialData) {
-        if (initialData.hasOwnProperty(i)) {
-          this.set(i, initialData[i]);
-        }
-      }
+      const keys = Object.keys(initialData);
+      keys.forEach((key) => {
+        this.set(key, initialData[key]);
+      });
     }
   }
 
@@ -26,7 +25,7 @@ export default class Lru<T> {
     return !!this.get(key);
   }
 
-  public get(key: string): T|undefined {
+  public get(key: string): T | undefined {
     return this.lru.get(key);
   }
 
