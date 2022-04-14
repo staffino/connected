@@ -56,7 +56,11 @@ export default function useCallResolver() {
             cache.set(cacheKey, { data, ttl: addMilliseconds(dataTtl) });
           })
           .catch((error) => {
-            cache.set(cacheKey, { error, ttl: addMilliseconds(errorTtl) });
+            cache.set(cacheKey, {
+              error,
+              data: stalledData,
+              ttl: addMilliseconds(errorTtl),
+            });
           });
         if (entry?.data !== undefined) {
           // we are not throwing promise, so we need to refresh once we update the data
@@ -71,7 +75,7 @@ export default function useCallResolver() {
   );
   return useCallback(
     (
-      fn: SerializableFunction | Command<any, any>,
+      fn: SerializableFunction | Command<never, never>,
       args: SerializableValue[],
       meta?: Meta
     ) => {
