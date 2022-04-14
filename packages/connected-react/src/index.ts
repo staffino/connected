@@ -1,4 +1,5 @@
 export { default as ConnectedProvider } from './connected-provider';
+export { default as ErrorHandler } from './error-handler';
 export { default as useResult } from './use-result';
 export { default as useInstance } from './use-instance';
 export { default as useCommands } from './use-commands';

@@ -1,15 +1,24 @@
-import React, { useCallback, useMemo, useReducer } from 'react';
+import React, { useCallback, useReducer } from 'react';
 import md5 from 'md5';
 import stringify from 'fast-json-stable-stringify';
 import ConnectedContext from './connected-context';
-import { SerializableValue } from './types';
+import {
+  Command,
+  Meta,
+  SerializableFunction,
+  SerializableValue,
+} from './types';
+import ErrorHandlerContext from './error-handler-context';
+
+type SerializableFunctionWithMeta = SerializableFunction & { meta?: Meta };
 
 function cacheKeyFn(
-  fn: Function,
+  fn: SerializableFunction,
   params: readonly SerializableValue[],
-  meta?: any
+  meta?: Meta
 ) {
-  const { meta: functionMeta, ...functionProperties } = fn as any;
+  const { meta: functionMeta, ...functionProperties } =
+    fn as SerializableFunctionWithMeta;
   const combinedMeta = functionMeta ?? meta;
   if (!combinedMeta) {
     console.warn(
@@ -28,15 +37,16 @@ function addMilliseconds(milliseconds: number, date?: Date) {
 
 export default function useCallResolver() {
   const { cache, dataTtl, errorTtl } = React.useContext(ConnectedContext);
+  const { onError: handleError } = React.useContext(ErrorHandlerContext);
   const [, forceReload] = useReducer((x) => x + 1, 0);
   const tryFetchData = useCallback(
-    (cacheKey, fn, args) => {
+    (cacheKey, fn, args, stalledData) => {
       let result;
       try {
         result = fn(...args);
       } catch (error) {
         cache.set(cacheKey, { error, ttl: addMilliseconds(errorTtl) });
-        throw error;
+        result = handleError(error, stalledData);
       }
 
       const entry = cache.get(cacheKey);
@@ -53,14 +63,18 @@ export default function useCallResolver() {
           result.finally(forceReload);
           return entry.data;
         }
-        throw result;
+        throw result; // throwing promise to suspend
       }
       return result;
     },
-    [cache, forceReload]
+    [cache, dataTtl, errorTtl, handleError]
   );
-  return useMemo(
-    () => (fn: Function, args: any[], meta?: any) => {
+  return useCallback(
+    (
+      fn: SerializableFunction | Command<any, any>,
+      args: SerializableValue[],
+      meta?: Meta
+    ) => {
       if (typeof fn !== 'function') {
         throw new TypeError(`${fn} is not a function`);
       }
@@ -68,15 +82,15 @@ export default function useCallResolver() {
       const entry = cache.get(cacheKey);
       if (entry) {
         if (entry.ttl < new Date()) {
-          return tryFetchData(cacheKey, fn, args);
+          return tryFetchData(cacheKey, fn, args, entry.data);
         }
         if (entry.error) {
-          throw entry.error;
+          return handleError(entry.error, entry.data);
         }
         return entry.data as SerializableValue;
       }
-      return tryFetchData(cacheKey, fn, args);
+      return tryFetchData(cacheKey, fn, args, undefined);
     },
-    [cache, tryFetchData]
+    [cache, handleError, tryFetchData]
   );
 }

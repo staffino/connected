@@ -69,3 +69,8 @@ export type ResolverFunction<T extends any[], R> = (
   parameters: T,
   meta?: Meta
 ) => R;
+
+export type ErrorHandlerFunction = (
+  error: Error,
+  stalledData?: SerializableValue
+) => SerializableValue;

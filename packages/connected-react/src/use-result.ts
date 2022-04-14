@@ -24,7 +24,10 @@ export default function useResult<
   F extends SerializableFunction,
   P extends Parameters<F>,
   T extends object
->(fnOrCommand: F | Command<FunctionKeys<T>, Newable<T>, T>, ...args: P) {
+>(
+  fnOrCommand: F | Command<FunctionKeys<T>, Newable<T>, T>,
+  ...args: P
+): Awaited<ReturnType<F>> {
   const callResolver = useCallResolver();
   return callResolver(fnOrCommand, args);
 }

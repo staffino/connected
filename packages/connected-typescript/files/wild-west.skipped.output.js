@@ -10,6 +10,7 @@ class PrivateEventEmitter extends events.EventEmitter {
 }
 const emitter = new PrivateEventEmitter();
 export default class EventEmitterProvider {
+    prefix;
     constructor(prefix = 'DATA') {
         this.prefix = prefix;
     }

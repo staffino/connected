@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint-disable class-methods-use-this, import/no-extraneous-dependencies, react-hooks/rules-of-hooks */
 
 import React from 'react';
 import { mount } from 'enzyme';
@@ -8,6 +9,7 @@ import { IsExact, assert } from 'conditional-type-checks';
 import useResult from './use-result';
 import { useCommands } from './index';
 import { Command, FunctionKeys, Newable, SafeParameters } from './types';
+import ErrorHandler from './error-handler';
 
 function f0() {
   return 'f0';
@@ -58,6 +60,14 @@ class Provider {
   async asyncMethod() {
     return 1;
   }
+
+  throwingError(): string {
+    throw new Error('E1');
+  }
+
+  throwingAsyncError(): Promise<string> {
+    return Promise.reject(new Error('EA1'));
+  }
 }
 
 const provider = new Provider();
@@ -90,7 +100,7 @@ const useResultAsyncMethod = () =>
 assert<IsExact<ReturnType<typeof useResultAsyncMethod>, number>>(true);
 /* =========== Static type tests end =========== */
 
-function Wrapper({ hookFn }: { hookFn: Function }) {
+function Wrapper({ hookFn }: { hookFn: () => any }) {
   const data = hookFn();
   return React.createElement(React.Fragment, null, data.toString());
 }
@@ -186,5 +196,30 @@ describe('useResult', () => {
       })
     );
     expect(wrapper.text()).toBe('m5');
+  });
+  it('throws error', () => {
+    expect(() => {
+      mount(
+        React.createElement(Wrapper, {
+          hookFn: () => useResult(provider.throwingError),
+        })
+      );
+    }).toThrow('E1');
+  });
+  it('handles error', () => {
+    const handleError = (_error: Error, _data: unknown) => {
+      return 'HandledE1';
+    };
+
+    const wrapper = mount(
+      React.createElement(
+        ErrorHandler,
+        { onError: handleError },
+        React.createElement(Wrapper, {
+          hookFn: () => useResult(provider.throwingError),
+        })
+      )
+    );
+    expect(wrapper.text()).toBe('HandledE1');
   });
 });
