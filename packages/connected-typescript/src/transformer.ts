@@ -25,7 +25,7 @@ type ClassDefinition = {
 type Definition = FunctionDefinition | ClassDefinition;
 
 function extractMemberGroup(
-  decorators?: ts.NodeArray<ts.Decorator>
+  decorators: readonly ts.Decorator[] | undefined
 ): string | undefined {
   return (
     decorators &&
@@ -49,7 +49,7 @@ function extractMemberGroup(
 
 function extractMembers(members: ts.NodeArray<ts.ClassElement>): Members[] {
   return members
-    .filter((member) => ts.isMethodDeclaration(member))
+    .filter(ts.isMethodDeclaration)
     .filter((method) => {
       const modifiers =
         method.modifiers?.map((modifier) => modifier.kind) ?? [];
@@ -64,7 +64,7 @@ function extractMembers(members: ts.NodeArray<ts.ClassElement>): Members[] {
       if (method.name && 'text' in method.name) {
         return {
           name: method.name?.text ?? '',
-          group: extractMemberGroup(method.decorators),
+          group: extractMemberGroup(ts.getDecorators(method)),
         };
       }
       return { name: '' };
@@ -85,7 +85,7 @@ class Transformer {
     this.f = context.factory;
   }
 
-  transformSource(sourceFile: ts.SourceFile) {
+  transformSource(sourceFile: ts.SourceFile): ts.SourceFile {
     if (this.options.pattern) {
       if (
         typeof this.options.pattern === 'string' &&
@@ -103,7 +103,7 @@ class Transformer {
         return sourceFile;
       }
     }
-    return ts.visitNode(sourceFile, this.visitor);
+    return ts.visitNode(sourceFile, this.visitor) as ts.SourceFile;
   }
 
   visitor = (node: ts.Node): ts.Node => {
@@ -178,7 +178,6 @@ class Transformer {
     return [
       this.f.createImportDeclaration(
         undefined,
-        undefined,
         this.f.createImportClause(
           false,
           this.f.createIdentifier('Client'),
@@ -223,7 +222,6 @@ class Transformer {
 
     const definitions: ts.Statement[] = [
       this.f.createFunctionDeclaration(
-        undefined,
         modifiers,
         undefined,
         this.f.createIdentifier(definition.name),
@@ -231,12 +229,10 @@ class Transformer {
         [
           this.f.createParameterDeclaration(
             undefined,
-            undefined,
             this.f.createToken(ts.SyntaxKind.DotDotDotToken),
             this.f.createIdentifier('args'),
             undefined,
             undefined,
-            undefined
           ),
         ],
         undefined,
@@ -318,7 +314,6 @@ class Transformer {
     // 1. generate class declaration
     statements.push(
       this.f.createClassDeclaration(
-        undefined,
         modifiers,
         this.f.createIdentifier(definition.name),
         undefined,
@@ -399,10 +394,8 @@ class Transformer {
   private generateClassConstructor() {
     return this.f.createConstructorDeclaration(
       undefined,
-      undefined,
       [
         this.f.createParameterDeclaration(
-          undefined,
           undefined,
           this.f.createToken(ts.SyntaxKind.DotDotDotToken),
           this.f.createIdentifier('args'),
@@ -445,13 +438,11 @@ class Transformer {
     return this.f.createMethodDeclaration(
       undefined,
       undefined,
-      undefined,
       this.f.createIdentifier(methodName),
       undefined,
       undefined,
       [
         this.f.createParameterDeclaration(
-          undefined,
           undefined,
           this.f.createToken(ts.SyntaxKind.DotDotDotToken),
           this.f.createIdentifier('args'),
