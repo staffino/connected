@@ -8,6 +8,6 @@ export default function useSuspendedCommands<
   klass: C,
   ...args: ConstructorParameters<C> | []
 ): CommandBuilder<C, T, true> {
-  const [, commands] = useInstanceWithSuspendedCommands(klass, ...args);
+  const [, commands] = useInstanceWithSuspendedCommands<C, T>(klass, ...args);
   return commands;
 }
