@@ -1,8 +1,8 @@
 import Client from "@connected/client";
 export default class Named {
     constructorParameters;
-    constructor(...constructorParameters) {
-        this.constructorParameters = constructorParameters;
+    constructor(...args) {
+        this.constructorParameters = args;
     }
     f1(...args) {
         return Client.execute("Named.f1", args, this?.constructorParameters);

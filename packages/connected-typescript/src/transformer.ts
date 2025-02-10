@@ -319,6 +319,7 @@ class Transformer {
         undefined,
         undefined,
         [
+          this.generateConstructorParamsField(),
           this.generateClassConstructor(),
           ...definition.members.map(({ name, group }) =>
             this.generateClassMethod(definition.name, name, group)
@@ -385,6 +386,19 @@ class Transformer {
     return statements;
   }
 
+  private generateConstructorParamsField() {
+    return this.f.createPropertyDeclaration(
+      [
+        this.f.createModifier(ts.SyntaxKind.PrivateKeyword),
+        this.f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+      ],
+      'constructorParameters',
+      undefined,
+      this.f.createArrayTypeNode(this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
+      undefined,
+    );
+  }
+
   /**
    * Generates class constructor:
    *   constructor(...args) {
@@ -396,18 +410,26 @@ class Transformer {
       undefined,
       [
         this.f.createParameterDeclaration(
-          [
-            this.f.createModifier(ts.SyntaxKind.PrivateKeyword),
-            this.f.createModifier(ts.SyntaxKind.ReadonlyKeyword)
-          ],
+          undefined,
           this.f.createToken(ts.SyntaxKind.DotDotDotToken),
-          this.f.createIdentifier('constructorParameters'),
+          this.f.createIdentifier('args'),
           undefined,
           this.f.createArrayTypeNode(this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
           undefined
         ),
       ],
-      this.f.createBlock([], true)
+      this.f.createBlock([
+        this.f.createExpressionStatement(
+          this.f.createBinaryExpression(
+            this.f.createPropertyAccessExpression(
+              this.f.createThis(),
+              this.f.createIdentifier('constructorParameters')
+            ),
+            this.f.createToken(ts.SyntaxKind.EqualsToken),
+            this.f.createIdentifier('args')
+          )
+        ),
+      ], true)
     );
   }
 

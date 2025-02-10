@@ -1,8 +1,8 @@
 import Client from "@connected/client";
 export class ExportedClass {
     constructorParameters;
-    constructor(...constructorParameters) {
-        this.constructorParameters = constructorParameters;
+    constructor(...args) {
+        this.constructorParameters = args;
     }
     classNamedMethod(...args) {
         return Client.execute("ExportedClass.classNamedMethod", args, this?.constructorParameters);
@@ -10,8 +10,8 @@ export class ExportedClass {
 }
 export default class ExportedDefaultClass {
     constructorParameters;
-    constructor(...constructorParameters) {
-        this.constructorParameters = constructorParameters;
+    constructor(...args) {
+        this.constructorParameters = args;
     }
     doAnything(...args) {
         return Client.execute("ExportedDefaultClass.doAnything", args, this?.constructorParameters);
