@@ -1,6 +1,7 @@
 import Client from "@connected/client";
 export class PrivateMethod {
-    constructor(...args) {
-        this.constructorParameters = args;
+    constructorParameters;
+    constructor(...constructorParameters) {
+        this.constructorParameters = constructorParameters;
     }
 }

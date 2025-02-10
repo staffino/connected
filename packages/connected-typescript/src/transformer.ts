@@ -244,9 +244,9 @@ class Transformer {
                 this.f.createPropertyAccessExpression(
                   module === ts.ModuleKind.CommonJS
                     ? this.f.createPropertyAccessExpression(
-                        this.f.createIdentifier('client_1'),
-                        this.f.createIdentifier('default')
-                      )
+                      this.f.createIdentifier('client_1'),
+                      this.f.createIdentifier('default')
+                    )
                     : this.f.createIdentifier('Client'),
                   this.f.createIdentifier('execute')
                 ),
@@ -362,11 +362,11 @@ class Transformer {
                           ),
                           ...(member.group
                             ? [
-                                this.f.createPropertyAssignment(
-                                  this.f.createIdentifier('group'),
-                                  this.f.createStringLiteral(member.group)
-                                ),
-                              ]
+                              this.f.createPropertyAssignment(
+                                this.f.createIdentifier('group'),
+                                this.f.createStringLiteral(member.group)
+                              ),
+                            ]
                             : []),
                         ],
                         false
@@ -396,29 +396,18 @@ class Transformer {
       undefined,
       [
         this.f.createParameterDeclaration(
-          undefined,
+          [
+            this.f.createModifier(ts.SyntaxKind.PrivateKeyword),
+            this.f.createModifier(ts.SyntaxKind.ReadonlyKeyword)
+          ],
           this.f.createToken(ts.SyntaxKind.DotDotDotToken),
-          this.f.createIdentifier('args'),
+          this.f.createIdentifier('constructorParameters'),
           undefined,
-          undefined,
+          this.f.createArrayTypeNode(this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
           undefined
         ),
       ],
-      this.f.createBlock(
-        [
-          this.f.createExpressionStatement(
-            this.f.createBinaryExpression(
-              this.f.createPropertyAccessExpression(
-                this.f.createThis(),
-                this.f.createIdentifier('constructorParameters')
-              ),
-              this.f.createToken(ts.SyntaxKind.EqualsToken),
-              this.f.createIdentifier('args')
-            )
-          ),
-        ],
-        true
-      )
+      this.f.createBlock([], true)
     );
   }
 
@@ -459,9 +448,9 @@ class Transformer {
               this.f.createPropertyAccessExpression(
                 module === ts.ModuleKind.CommonJS
                   ? this.f.createPropertyAccessExpression(
-                      this.f.createIdentifier('client_1'),
-                      this.f.createIdentifier('default')
-                    )
+                    this.f.createIdentifier('client_1'),
+                    this.f.createIdentifier('default')
+                  )
                   : this.f.createIdentifier('Client'),
                 this.f.createIdentifier('execute')
               ),

@@ -1,7 +1,8 @@
 import Client from "@connected/client";
 export default class EventEmitterProvider {
-    constructor(...args) {
-        this.constructorParameters = args;
+    constructorParameters;
+    constructor(...constructorParameters) {
+        this.constructorParameters = constructorParameters;
     }
     invokeError(...args) {
         return Client.execute("EventEmitterProvider.invokeError", args, this?.constructorParameters);
