@@ -42,7 +42,7 @@ function ConnectedProvider({
   dataTtl = 60 * 1000,
   errorTtl = 5 * 1000,
 
-  factory,
+  factory = <T>(klass: Newable<T>, ...args: any[]) => new klass(args),
   initialCacheData = {},
   onCacheUpdate,
 
@@ -77,17 +77,5 @@ function ConnectedProvider({
     children
   );
 }
-
-// ConnectedProvider.defaultProps = {
-//   maxCacheSize: 500,
-//   dataTtl: 60 * 1000,
-//   errorTtl: 5 * 1000,
-//
-//   initialCacheData: {},
-//   // eslint-disable-next-line new-cap
-//   factory: <T>(klass: Newable<T>, ...args: any[]) => new klass(args),
-//   onCacheUpdate: undefined,
-//   children: undefined,
-// };
 
 export default ConnectedProvider;
