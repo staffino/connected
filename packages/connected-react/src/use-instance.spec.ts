@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
+import * as React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Newable } from './types';
 import useInstance from './use-instance';
 import ConnectedProvider from './connected-provider';
@@ -37,18 +38,18 @@ function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
 }
 describe('useInstance', () => {
   it('creates an instance of a class', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, { hookFn: () => useInstance(X) })
     );
-    expect(wrapper.text()).toBe('42');
+    expect(screen.getByText(42)).toBeInTheDocument();
   });
 
   it('creates an instance using custom factory', () => {
-    const wrapper = mount(
+    render(
       React.createElement(CustomFactoryWrapper, {
         hookFn: () => useInstance(Y),
       })
     );
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 });

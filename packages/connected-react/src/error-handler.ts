@@ -13,6 +13,3 @@ export default function ErrorHandler({ onError, children }: Props) {
     children
   );
 }
-ErrorHandler.defaultProps = {
-  children: undefined,
-};

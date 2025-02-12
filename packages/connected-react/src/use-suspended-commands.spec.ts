@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
+import * as React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { assert, IsExact } from 'conditional-type-checks';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
@@ -55,20 +56,20 @@ function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
 }
 describe('useSuspendedCommands', () => {
   it('creates a command object', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useSuspendedCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('creates a command object using factory', () => {
-    const wrapper = mount(
+    render(
       React.createElement(CustomFactoryWrapper, {
         hookFn: () => useSuspendedCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('pi');
+    expect(screen.getByText('pi')).toBeInTheDocument();
   });
 });

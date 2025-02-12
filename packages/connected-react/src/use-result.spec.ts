@@ -3,8 +3,9 @@
  */
 /* eslint-disable class-methods-use-this, import/no-extraneous-dependencies, react-hooks/rules-of-hooks */
 
-import React from 'react';
-import { mount } from 'enzyme';
+import * as React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { IsExact, assert } from 'conditional-type-checks';
 import useResult from './use-result';
 import { useCommands } from './index';
@@ -107,99 +108,99 @@ function Wrapper({ hookFn }: { hookFn: () => any }) {
 
 describe('useResult', () => {
   it('uses function with 0 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, { hookFn: () => useResult(f0) })
     );
-    expect(wrapper.text()).toBe('f0');
+    expect(screen.getByText('f0')).toBeInTheDocument();
   });
   it('uses function with 1 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, { hookFn: () => useResult(f1, 'a1') })
     );
-    expect(wrapper.text()).toBe('1');
+    expect(screen.getByText('1')).toBeInTheDocument();
   });
   it('uses function with 2 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, { hookFn: () => useResult(f2, 'a1', 2) })
     );
-    expect(wrapper.text()).toBe('f2');
+    expect(screen.getByText('f2')).toBeInTheDocument();
   });
   it('uses function with 3 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(f3, 'a1', 2, 'a3'),
       })
     );
-    expect(wrapper.text()).toBe('f3');
+    expect(screen.getByText('f3')).toBeInTheDocument();
   });
   it('uses function with 4 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(f4, 'a1', 2, 'a3', 4),
       })
     );
-    expect(wrapper.text()).toBe('f4');
+    expect(screen.getByText('f4')).toBeInTheDocument();
   });
   it('uses function with 5 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(f5, 'a1', 2, 'a3', 4, 'a5'),
       })
     );
-    expect(wrapper.text()).toBe('f5');
+    expect(screen.getByText('f5')).toBeInTheDocument();
   });
   it('uses command with 0 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(buildCommand(provider, 'm0')),
       })
     );
-    expect(wrapper.text()).toBe('m0');
+    expect(screen.getByText('m0')).toBeInTheDocument();
   });
   it('uses request with 1 parameter', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(buildCommand(provider, 'm1', 'a1')),
       })
     );
-    expect(wrapper.text()).toBe('1');
+    expect(screen.getByText('1')).toBeInTheDocument();
   });
   it('uses request with 2 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(buildCommand(provider, 'm2', 'a1', 2)),
       })
     );
-    expect(wrapper.text()).toBe('m2');
+    expect(screen.getByText('m2')).toBeInTheDocument();
   });
   it('uses request with 3 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(buildCommand(provider, 'm3', 'a1', 2, 'a3')),
       })
     );
-    expect(wrapper.text()).toBe('m3');
+    expect(screen.getByText('m3')).toBeInTheDocument();
   });
   it('uses request with 4 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () => useResult(buildCommand(provider, 'm4', 'a1', 2, 'a3', 4)),
       })
     );
-    expect(wrapper.text()).toBe('m4');
+    expect(screen.getByText('m4')).toBeInTheDocument();
   });
   it('uses request with 5 parameters', () => {
-    const wrapper = mount(
+    render(
       React.createElement(Wrapper, {
         hookFn: () =>
           useResult(buildCommand(provider, 'm5', 'a1', 2, 'a3', 4, 'a5')),
       })
     );
-    expect(wrapper.text()).toBe('m5');
+    expect(screen.getByText('m5')).toBeInTheDocument();
   });
   it('throws error', () => {
     expect(() => {
-      mount(
+      render(
         React.createElement(Wrapper, {
           hookFn: () => useResult(provider.throwingError),
         })
@@ -211,7 +212,7 @@ describe('useResult', () => {
       return 'HandledE1';
     };
 
-    const wrapper = mount(
+    render(
       React.createElement(
         ErrorHandler,
         { onError: handleError },
@@ -220,6 +221,6 @@ describe('useResult', () => {
         })
       )
     );
-    expect(wrapper.text()).toBe('HandledE1');
+    expect(screen.getByText('HandledE1')).toBeInTheDocument();
   });
 });

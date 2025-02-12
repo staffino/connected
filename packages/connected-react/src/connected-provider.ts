@@ -38,18 +38,18 @@ function prepareInitialData(
 }
 
 function ConnectedProvider({
-  maxCacheSize,
-  dataTtl,
-  errorTtl,
+  maxCacheSize = 500,
+  dataTtl = 60 * 1000,
+  errorTtl = 5 * 1000,
 
   factory,
-  initialCacheData,
+  initialCacheData = {},
   onCacheUpdate,
 
   children,
 }: Props) {
   const handleCacheUpdate = useCallback(
-    (action, key, value) => {
+    (action: 'set' | 'delete', key: string, value: any) => {
       if (onCacheUpdate && action === 'set' && 'data' in value) {
         onCacheUpdate(key, value.data);
       }
@@ -78,16 +78,16 @@ function ConnectedProvider({
   );
 }
 
-ConnectedProvider.defaultProps = {
-  maxCacheSize: 500,
-  dataTtl: 60 * 1000,
-  errorTtl: 5 * 1000,
-
-  initialCacheData: {},
-  // eslint-disable-next-line new-cap
-  factory: <T>(klass: Newable<T>, ...args: any[]) => new klass(args),
-  onCacheUpdate: undefined,
-  children: undefined,
-};
+// ConnectedProvider.defaultProps = {
+//   maxCacheSize: 500,
+//   dataTtl: 60 * 1000,
+//   errorTtl: 5 * 1000,
+//
+//   initialCacheData: {},
+//   // eslint-disable-next-line new-cap
+//   factory: <T>(klass: Newable<T>, ...args: any[]) => new klass(args),
+//   onCacheUpdate: undefined,
+//   children: undefined,
+// };
 
 export default ConnectedProvider;

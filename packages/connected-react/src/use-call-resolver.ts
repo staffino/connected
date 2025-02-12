@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react';
+import React, { useCallback, useReducer, startTransition } from 'react';
 import md5 from 'md5';
 import stringify from 'fast-json-stable-stringify';
 import ConnectedContext from './connected-context';
@@ -40,7 +40,7 @@ export default function useCallResolver() {
   const { onError: handleError } = React.useContext(ErrorHandlerContext);
   const [, forceReload] = useReducer((x) => x + 1, 0);
   const tryFetchData = useCallback(
-    (cacheKey, fn, args, stalledData) => {
+    (cacheKey: string, fn: (...args: any[]) => any, args: any[], stalledData: any) => {
       let result;
       try {
         result = fn(...args);
@@ -64,7 +64,9 @@ export default function useCallResolver() {
           });
         if (entry?.data !== undefined) {
           // we are not throwing promise, so we need to refresh once we update the data
-          result.finally(forceReload);
+          result.finally(() => {
+            startTransition(() => { forceReload(); })
+          });
           return entry.data;
         }
         throw result; // throwing promise to suspend

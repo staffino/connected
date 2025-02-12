@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
+import * as React from 'react';
+import { act, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { assert, IsExact } from 'conditional-type-checks';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
@@ -83,33 +84,39 @@ const InstanceCustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
 };
 describe('useInstanceWithSuspendedCommands', () => {
   it('uses command object', () => {
-    const wrapper = mount(React.createElement(
+    render(React.createElement(
       CommandWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
-  xit('strips promise', () => {
-    const wrapper = mount(React.createElement(
-      CommandCustomFactoryWrapper,
-      { fn: 'promised', hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
-    expect(wrapper.text()).toBe('3.14');
+  xit('strips promise', async () => {
+    await act(async () => {
+      render(
+        React.createElement(
+          CommandCustomFactoryWrapper,
+          { fn: 'promised', hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }
+        )
+      );
+    });
+    screen.debug();
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('uses command object with custom factory', () => {
-    const wrapper = mount(React.createElement(
+    render(React.createElement(
       CommandCustomFactoryWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
-    expect(wrapper.text()).toBe('pi');
+    expect(screen.getByText('pi')).toBeInTheDocument();
   });
 
   it('uses instance object', () => {
-    const wrapper = mount(React.createElement(
+    render(React.createElement(
       InstanceWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('uses command object with custom factory', () => {
-    const wrapper = mount(React.createElement(
+    render(React.createElement(
       InstanceCustomFactoryWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
-    expect(wrapper.text()).toBe('pi');
+    expect(screen.getByText('pi')).toBeInTheDocument();
   });
 });

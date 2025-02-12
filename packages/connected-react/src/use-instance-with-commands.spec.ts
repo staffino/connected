@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
+import * as React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { assert, IsExact } from 'conditional-type-checks';
 import { Newable } from './types';
 import ConnectedProvider from './connected-provider';
@@ -62,38 +63,38 @@ function InstanceCustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
 }
 describe('useInstanceWithCommands', () => {
   it('uses command object', () => {
-    const wrapper = mount(
+    render(
       React.createElement(CommandWrapper, {
         hookFn: () => useInstanceWithCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('uses command object with custom factory', () => {
-    const wrapper = mount(
+    render(
       React.createElement(CommandCustomFactoryWrapper, {
         hookFn: () => useInstanceWithCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('pi');
+    expect(screen.getByText('pi')).toBeInTheDocument();
   });
 
   it('uses instance object', () => {
-    const wrapper = mount(
+    render(
       React.createElement(InstanceWrapper, {
         hookFn: () => useInstanceWithCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('3.14');
+    expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('uses command object with custom factory', () => {
-    const wrapper = mount(
+    render(
       React.createElement(InstanceCustomFactoryWrapper, {
         hookFn: () => useInstanceWithCommands(X, '3.14'),
       })
     );
-    expect(wrapper.text()).toBe('pi');
+    expect(screen.getByText('pi')).toBeInTheDocument();
   });
 });
