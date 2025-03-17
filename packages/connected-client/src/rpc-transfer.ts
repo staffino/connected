@@ -18,6 +18,7 @@ import RpcError from './rpc-error';
 
 export type RpcTransferOptions = {
   url?: string;
+  headers?: Record<string, string>;
 };
 
 type ResolveType = (value: unknown) => void;
@@ -45,10 +46,12 @@ export default class RpcTransfer {
 
   constructor(urlOrOptions?: string | RpcTransferOptions) {
     let url = '/rpc';
+    let headers = {};
     if (typeof urlOrOptions === 'string') {
       url = urlOrOptions;
-    } else if (typeof urlOrOptions === 'object' && urlOrOptions.url) {
-      url = urlOrOptions.url;
+    } else if (typeof urlOrOptions === 'object') {
+      url = urlOrOptions.url ?? url;
+      headers = urlOrOptions.headers ?? {}
     }
 
     function serverRequester(
@@ -60,6 +63,7 @@ export default class RpcTransfer {
         body: request,
         headers: {
           'Content-Type': 'application/json',
+          ...headers,
         },
       };
 
