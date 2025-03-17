@@ -139,9 +139,9 @@ describe('RpcTransfer', () => {
       }]))
     );
     const transfer = new RpcTransfer({
-      headers: { 'x-application-id': 'connected' },
+      headers: { 'x-application-id': '@connected' },
     });
     const result = await transfer.request('a', { _name: 'b', params: {} });
-    expect(result).toBe('connected');
+    expect(result).toBe('@connected');
   })
 });
