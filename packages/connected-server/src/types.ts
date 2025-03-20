@@ -1,4 +1,4 @@
-import { IExecutor } from './executor/types';
+import { IExecutor } from './executor/types.js';
 
 export type SerializableValue =
   | null

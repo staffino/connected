@@ -1,5 +1,5 @@
-import Middleware from './middleware';
-import { NextFunction, Request, Response, SerializableValue } from './types';
+import Middleware from './middleware.js';
+import { NextFunction, Request, Response, SerializableValue } from './types.js';
 
 type RequestHandler = (
   request: Request,

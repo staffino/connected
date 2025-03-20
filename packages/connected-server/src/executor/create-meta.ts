@@ -1,4 +1,4 @@
-import { Callable } from './types';
+import { Callable } from './types.js';
 
 export default function createMeta(callable: Callable) {
   const fn = callable.property

@@ -1,4 +1,5 @@
-import buildCallableMap from './build-callabale-map';
+import { describe, expect, it } from 'vitest';
+import buildCallableMap from './build-callabale-map.js';
 
 describe('buildCallableMap', () => {
   it('returns callable map', () => {

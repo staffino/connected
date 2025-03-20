@@ -1,4 +1,4 @@
-import { Callable, CallableMap } from './types';
+import { Callable, CallableMap } from './types.js';
 
 export default function buildCallableMap(callables: Callable[]): CallableMap {
   const map = new Map<string, Callable[]>();

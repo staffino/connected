@@ -1,3 +1,3 @@
-export { IExecutor, IHandler } from './types';
-export { ExecutorBuilder } from './executor';
-export { JsonRpcHandler } from './handlers';
+export { IExecutor, IHandler } from './types.js';
+export { ExecutorBuilder } from './executor/index.js';
+export { JsonRpcHandler } from './handlers/index.js';

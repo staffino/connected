@@ -1,5 +1,5 @@
-import { CallableMap, ExecutorOptions, IExecutor } from './types';
-import { SerializableValue } from '../types';
+import { CallableMap, ExecutorOptions, IExecutor } from './types.js';
+import { SerializableValue } from '../types.js';
 
 type Newable<T> = { new (...args: any[]): T };
 

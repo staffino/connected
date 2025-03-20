@@ -3,13 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "strictNullChecks": true,
-    "noUnusedParameters": true,
-    "lib": ["es2015", "dom"],
-    "composite": true
+    "lib": [ "es2023", "dom" ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts"]
+  "include": [ "src/**/*.ts" ]
 }

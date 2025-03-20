@@ -1,6 +1,6 @@
 import React from 'react';
-import { ErrorHandlerFunction } from './types';
-import ErrorHandlerContext from './error-handler-context';
+import { ErrorHandlerFunction } from './types.js';
+import ErrorHandlerContext from './error-handler-context.js';
 
 type Props = {
   onError: ErrorHandlerFunction;

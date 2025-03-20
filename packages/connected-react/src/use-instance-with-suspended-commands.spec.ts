@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 
+import { afterEach, describe, expect, it } from 'vitest';
 import * as React from 'react';
-import { act, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { act, cleanup, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import { assert, IsExact } from 'conditional-type-checks';
-import { Newable } from './types';
-import ConnectedProvider from './connected-provider';
-import useInstanceWithSuspendedCommands from './use-instance-with-suspended-commands';
+import { Newable } from './types.js';
+import ConnectedProvider from './connected-provider.js';
+import useInstanceWithSuspendedCommands from './use-instance-with-suspended-commands.js';
 
 class X {
   p1: string;
@@ -70,7 +71,7 @@ function CommandCustomFactoryWrapper({
 }) {
   return React.createElement(
     ConnectedProvider,
-    { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass('pi') },
+    { factory: <T>(klass: Newable<T>, ..._args: any[]) => new klass('pi') },
     React.createElement(
       React.Suspense,
       { fallback: '...' },
@@ -85,7 +86,7 @@ function InstanceWrapper({ hookFn }: { hookFn: Function }) {
 function InstanceCustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
   return React.createElement(
     ConnectedProvider,
-    { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass('pi') },
+    { factory: <T>(klass: Newable<T>, ..._args: any[]) => new klass('pi') },
     React.createElement(
       React.Suspense,
       { fallback: '...' },
@@ -93,6 +94,11 @@ function InstanceCustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
     )
   );
 }
+
+afterEach(() => {
+  cleanup();
+});
+
 describe('useInstanceWithSuspendedCommands', () => {
   it('uses command object', () => {
     render(
@@ -103,7 +109,7 @@ describe('useInstanceWithSuspendedCommands', () => {
     expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
-  xit('strips promise', async () => {
+  it.skip('strips promise', async () => {
     await act(async () => {
       render(
         React.createElement(CommandCustomFactoryWrapper, {

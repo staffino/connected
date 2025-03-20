@@ -1,6 +1,6 @@
 import React from 'react';
-import Lru from './lru';
-import { CacheItem, Newable } from './types';
+import Lru from './lru.js';
+import { CacheItem, Newable } from './types.js';
 
 const ConnectedContext = React.createContext({
   cache: new Lru<CacheItem>(undefined, 100),

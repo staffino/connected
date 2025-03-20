@@ -1,4 +1,5 @@
-import extractCallable from './extract-callable';
+import { describe, expect, it } from 'vitest';
+import extractCallable from './extract-callable.js';
 
 class A {
   x1() {}

@@ -1,5 +1,5 @@
-import RpcTransfer, { RpcTransferOptions } from './rpc-transfer';
-import { Request, Response, NextFunction } from './types';
+import RpcTransfer, { RpcTransferOptions } from './rpc-transfer.js';
+import { Request, Response, NextFunction } from './types.js';
 
 export default function rpcTransferMiddleware(
   urlOrOptions?: string | RpcTransferOptions

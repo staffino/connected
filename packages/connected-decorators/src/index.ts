@@ -1,1 +1,1 @@
-export { default as group } from './group';
+export { default as group } from './group.js';

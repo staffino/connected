@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import { CommandBuilder, Newable } from './types';
-import ConnectedContext from './connected-context';
-import useCallResolver from './use-call-resolver';
-import buildCommands from './build-commands';
+import { CommandBuilder, Newable } from './types.js';
+import ConnectedContext from './connected-context.js';
+import useCallResolver from './use-call-resolver.js';
+import buildCommands from './build-commands.js';
 
 export default function useInstanceWithSuspendedCommands<
   C extends Newable<T>,

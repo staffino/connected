@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,
-    "noUnusedParameters": false,
-    "noUnusedLocals": true,
+    // properties defined in https://github.com/tsconfig/bases/blob/main/bases/node20.json
+    "lib": [ "es2023" ],
+    "module": "node16",
+    "target": "es2022",
+    // "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "removeComments": true,
-    "sourceMap": true,
+    "moduleResolution": "node16",
+
+    // other properties:
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "target": "es5",
-    "module": "commonjs",
-    "esModuleInterop": true
+    "importHelpers": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strictNullChecks": true
   },
   "references": [
     { "path": "packages/connected-client" },

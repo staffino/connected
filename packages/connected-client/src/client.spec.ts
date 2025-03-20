@@ -1,9 +1,10 @@
-import Client from './client';
-import Middleware from './middleware';
+import { describe, expect, it, vi } from 'vitest';
+import Client from './client.js';
+import Middleware from './middleware.js';
 
 describe('Client static interface', () => {
   it('uses middleware', async () => {
-    const middleware = jest.fn((_request, _response, next) => next());
+    const middleware = vi.fn((_request, _response, next) => next());
     (Client as any).instance.middleware = new Middleware();
     Client.use(middleware);
     await Client.execute('fn', []);
@@ -11,8 +12,8 @@ describe('Client static interface', () => {
   });
 
   it('throws error if invalid middleware', async () => {
-    const middleware: any = jest.fn(
-      (_invalid, _number, _of, _parameters, next) => next()
+    const middleware: any = vi.fn((_invalid, _number, _of, _parameters, next) =>
+      next()
     );
     (Client as any).instance.middleware = new Middleware();
     expect(() => Client.use(middleware)).toThrow(TypeError);
@@ -38,9 +39,7 @@ describe('Client static interface', () => {
   });
 
   it('calls error middleware', async () => {
-    const middleware = jest.fn((error, _request, _response, next) =>
-      next(error)
-    );
+    const middleware = vi.fn((error, _request, _response, next) => next(error));
     (Client as any).instance.middleware = new Middleware();
     Client.use((_request: any, _response: any, next: (error?: Error) => void) =>
       next(new Error('abc'))
@@ -54,7 +53,7 @@ describe('Client static interface', () => {
 
 describe('Client instance interface', () => {
   it('uses middleware', async () => {
-    const middleware = jest.fn((_request, _response, next) => next());
+    const middleware = vi.fn((_request, _response, next) => next());
     const client = new Client();
     client.use(middleware);
     await client.execute('fn', []);
@@ -62,8 +61,8 @@ describe('Client instance interface', () => {
   });
 
   it('throws error if invalid middleware', async () => {
-    const middleware: any = jest.fn(
-      (_invalid, _number, _of, _parameters, next) => next()
+    const middleware: any = vi.fn((_invalid, _number, _of, _parameters, next) =>
+      next()
     );
     const client = new Client();
     expect(() => client.use(middleware)).toThrow(TypeError);
@@ -89,9 +88,7 @@ describe('Client instance interface', () => {
   });
 
   it('calls error middleware', async () => {
-    const middleware = jest.fn((error, _request, _response, next) =>
-      next(error)
-    );
+    const middleware = vi.fn((error, _request, _response, next) => next(error));
     const client = new Client();
     client.use((_request: any, _response: any, next: (error?: Error) => void) =>
       next(new Error('abc'))

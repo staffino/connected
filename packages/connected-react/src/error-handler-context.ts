@@ -1,5 +1,5 @@
 import React from 'react';
-import { ErrorHandlerFunction } from './types';
+import { ErrorHandlerFunction } from './types.js';
 
 type ErrorHandlerContextType = {
   onError: ErrorHandlerFunction;

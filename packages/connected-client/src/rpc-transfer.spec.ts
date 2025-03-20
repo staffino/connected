@@ -1,14 +1,17 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import 'jest-fetch-mock';
-import RpcTransfer from './rpc-transfer';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import createFetchMock from 'vitest-fetch-mock';
+import RpcTransfer from './rpc-transfer.js';
+
+const fetchMocker = createFetchMock(vi);
+fetchMocker.enableMocks();
 
 let uuidValue = 0;
-jest.mock('uuid/v4', () => {
-  return () => {
+vi.mock('uuid/v4.js', () => ({
+  default: () => {
     uuidValue += 1;
     return uuidValue.toString();
-  };
-});
+  },
+}));
 
 describe('RpcTransfer', () => {
   beforeEach(() => {
@@ -20,33 +23,33 @@ describe('RpcTransfer', () => {
     fetchMock.mockResponseOnce(
       JSON.stringify([{ jsonrpc: '2.0', result: '1', id: '1' }])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     const result = await transfer.request('a', { _name: 'b', params: {} });
     expect(result).toBe('1');
     expect(fetchMock.mock.calls.length).toEqual(1);
-    expect(fetchMock.mock.calls[0][0]).toBe('/rpc');
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost/rpc');
   });
 
   it('accepts string as url option', async () => {
     fetchMock.mockResponseOnce(
       JSON.stringify([{ jsonrpc: '2.0', result: '1', id: '1' }])
     );
-    const transfer = new RpcTransfer('/rpc2');
+    const transfer = new RpcTransfer('http://localhost/rpc2');
     const result = await transfer.request('a', { _name: 'b', params: {} });
     expect(result).toBe('1');
     expect(fetchMock.mock.calls.length).toEqual(1);
-    expect(fetchMock.mock.calls[0][0]).toBe('/rpc2');
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost/rpc2');
   });
 
   it('accepts options.url', async () => {
     fetchMock.mockResponseOnce(
       JSON.stringify([{ jsonrpc: '2.0', result: '1', id: '1' }])
     );
-    const transfer = new RpcTransfer({ url: '/rpc3' });
+    const transfer = new RpcTransfer({ url: 'http://localhost/rpc3' });
     const result = await transfer.request('a', { _name: 'b', params: {} });
     expect(result).toBe('1');
     expect(fetchMock.mock.calls.length).toEqual(1);
-    expect(fetchMock.mock.calls[0][0]).toBe('/rpc3');
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost/rpc3');
   });
 
   it('batches requests', async () => {
@@ -56,7 +59,7 @@ describe('RpcTransfer', () => {
         { jsonrpc: '2.0', result: '10', id: '2' },
       ])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     const [r1, r2] = await Promise.all([
       transfer.request('a', { _name: 'aX', params: {} }),
       transfer.request('b', { _name: 'bX', params: {} }),
@@ -70,7 +73,7 @@ describe('RpcTransfer', () => {
     fetchMock.mockResponseOnce(
       JSON.stringify([{ jsonrpc: '2.0', result: '10', id: '1' }])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     const result = await transfer.request('a', { _name: 'b', params: {} });
     expect(result).toBe('10');
   });
@@ -81,7 +84,7 @@ describe('RpcTransfer', () => {
         { jsonrpc: '2.0', error: { code: 409, message: 'Conflict' }, id: '1' },
       ])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     await expect(
       transfer.request('a', { _name: 'b', params: {} })
     ).rejects.toThrow('Conflict');
@@ -89,7 +92,7 @@ describe('RpcTransfer', () => {
 
   it('handles transport error', async () => {
     fetchMock.mockRejectOnce(new Error('Transport error'));
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     await expect(
       transfer.request('a', { _name: 'b', params: {} })
     ).rejects.toThrow('Transport');
@@ -97,7 +100,7 @@ describe('RpcTransfer', () => {
 
   it('handles invalid response', async () => {
     fetchMock.mockResponseOnce('x'); // a totally screwed-up response
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     await expect(
       transfer.request('a', { _name: 'b', params: {} })
     ).rejects.toThrow();
@@ -109,7 +112,7 @@ describe('RpcTransfer', () => {
         { jsonrpc: '2.0', id: null }, // no id present in the response (simulates invalid request)
       ])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     await expect(
       transfer.request('a', { _name: 'b', params: {} })
     ).rejects.toThrow();
@@ -120,7 +123,7 @@ describe('RpcTransfer', () => {
       JSON.stringify([{ jsonrpc: '2.0', result: '1', id: '1' }]),
       JSON.stringify([{ jsonrpc: '2.0', result: '10', id: '2' }])
     );
-    const transfer = new RpcTransfer();
+    const transfer = new RpcTransfer('http://localhost/rpc');
     const [r1, r2] = await Promise.all([
       transfer.request('a', { _name: 'aX', params: {} }),
       transfer.request('b', { _name: 'bX', params: {} }, 'post'),
@@ -143,6 +146,7 @@ describe('RpcTransfer', () => {
       )
     );
     const transfer = new RpcTransfer({
+      url: 'http://localhost/rpc',
       headers: { 'x-application-id': '@connected' },
     });
     const result = await transfer.request('a', { _name: 'b', params: {} });

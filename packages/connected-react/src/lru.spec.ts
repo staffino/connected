@@ -1,4 +1,5 @@
-import Lru from './lru';
+import { describe, expect, it, vi } from 'vitest';
+import Lru from './lru.js';
 
 describe('Lru', () => {
   describe('new', () => {
@@ -70,7 +71,7 @@ describe('Lru', () => {
     });
 
     it('emits event', () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const lru = new Lru({}, 10, handler);
       lru.set('key1', 1);
       lru.set('key2', 2);

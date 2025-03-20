@@ -1,4 +1,5 @@
-import group from './group';
+import { describe, expect, it } from 'vitest';
+import group from './group.js';
 
 class A {
   // @ts-ignore

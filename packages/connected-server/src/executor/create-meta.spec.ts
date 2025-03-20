@@ -1,4 +1,5 @@
-import createMeta from './create-meta';
+import { describe, expect, it } from 'vitest';
+import createMeta from './create-meta.js';
 
 class A {
   m1() {}

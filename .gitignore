@@ -27,8 +27,8 @@ dist
 # IDEs
 .idea/
 .vcode/
+.vscode/
 
 yarn.lock
 
-tsconfig.tsbuildinfo
-
+*.tsbuildinfo

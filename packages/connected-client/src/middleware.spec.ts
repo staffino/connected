@@ -1,4 +1,5 @@
-import Middleware from './middleware';
+import { describe, expect, it } from 'vitest';
+import Middleware from './middleware.js';
 
 describe('Middleware', () => {
   it('returns unchanged args if no handlers', async () => {

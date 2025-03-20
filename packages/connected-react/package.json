@@ -12,6 +12,7 @@
   "author": "Martin Komara <martin.komara@gmail.com>",
   "homepage": "https://staffino.github.io/connected/",
   "license": "ISC",
+  "type": "module",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "directories": {
@@ -26,14 +27,14 @@
   },
   "scripts": {
     "prepare": "run-s build lint",
-    "coverage": "jest --coverage",
-    "test": "run-s test:syntax test:jest",
+    "coverage": "vitest run --coverage",
+    "test": "run-s test:syntax test:vitest",
     "test:syntax": "tsc --noEmit",
-    "test:jest": "jest",
+    "test:vitest": "vitest run",
     "prebuild": "npm run clean",
-    "build": "tsc --build .",
+    "build": "tsc --build tsconfig-build.json",
     "lint": "eslint -c '../../.eslintrc.json'",
-    "clean": "rimraf coverage build tsconfig.tsbuildinfo dist/*"
+    "clean": "rimraf coverage build *.tsbuildinfo dist/*"
   },
   "bugs": {
     "url": "https://github.com/staffino/connected/issues"
@@ -50,7 +51,8 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "npm-run-all": "^4.1.5",
-    "react-test-renderer": "^18"
+    "react-test-renderer": "^18",
+    "vitest": "^3.0.9"
   },
   "gitHead": "94aa5f5c83f052742811e320926b3ae674f6cdcb"
 }

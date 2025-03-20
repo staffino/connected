@@ -10,7 +10,7 @@ import {
   ResponsePayload,
 } from 'json-rpc-msg';
 import { json } from 'body-parser';
-import { IHandler, IExecutor } from '../types';
+import { IHandler, IExecutor } from '../types.js';
 
 type IncommingMessage = import('http').IncomingMessage;
 type ServerResponse = import('http').ServerResponse;

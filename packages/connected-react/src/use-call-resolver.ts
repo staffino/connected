@@ -1,14 +1,14 @@
 import React, { useCallback, useReducer, startTransition } from 'react';
 import md5 from 'md5';
 import stringify from 'fast-json-stable-stringify';
-import ConnectedContext from './connected-context';
+import ConnectedContext from './connected-context.js';
 import {
   Command,
   Meta,
   SerializableFunction,
   SerializableValue,
-} from './types';
-import ErrorHandlerContext from './error-handler-context';
+} from './types.js';
+import ErrorHandlerContext from './error-handler-context.js';
 
 type SerializableFunctionWithMeta = SerializableFunction & { meta?: Meta };
 

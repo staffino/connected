@@ -1,16 +1,16 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint-disable class-methods-use-this, import/no-extraneous-dependencies, react-hooks/rules-of-hooks */
 
+import { afterEach, describe, expect, it } from 'vitest';
 import * as React from 'react';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { cleanup, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import { IsExact, assert } from 'conditional-type-checks';
-import useResult from './use-result';
-import { useCommands } from './index';
-import { Command, FunctionKeys, Newable, SafeParameters } from './types';
-import ErrorHandler from './error-handler';
+import useResult from './use-result.js';
+import { useCommands } from './index.js';
+import { Command, FunctionKeys, Newable, SafeParameters } from './types.js';
+import ErrorHandler from './error-handler.js';
 
 function f0() {
   return 'f0';
@@ -79,7 +79,6 @@ function buildCommand<T extends object, M extends FunctionKeys<T>>(
   ...args: SafeParameters<T[M]>
 ): Command<M, Newable<T>, T> {
   const fn = () =>
-    // eslint-disable-next-line @typescript-eslint/ban-types
     (instance[method] as unknown as Function).bind(instance)(...args);
   fn.parameters = args;
   fn.constructorParameters = [0];
@@ -105,6 +104,10 @@ function Wrapper({ hookFn }: { hookFn: () => any }) {
   const data = hookFn();
   return React.createElement(React.Fragment, null, data.toString());
 }
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('useResult', () => {
   it('uses function with 0 parameters', () => {
