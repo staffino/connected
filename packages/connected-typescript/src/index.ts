@@ -1,1 +1,1 @@
-export { default as default } from './transformer.js';
+export { default } from './transformer.js';

@@ -79,7 +79,6 @@ class Transformer {
 
   constructor(
     private readonly context: ts.TransformationContext,
-    // eslint-disable-next-line no-unused-vars
     private readonly options: Options = { generateMeta: true }
   ) {
     this.f = context.factory;
@@ -232,7 +231,7 @@ class Transformer {
             this.f.createToken(ts.SyntaxKind.DotDotDotToken),
             this.f.createIdentifier('args'),
             undefined,
-            undefined,
+            undefined
           ),
         ],
         undefined,
@@ -244,9 +243,9 @@ class Transformer {
                 this.f.createPropertyAccessExpression(
                   module === ts.ModuleKind.CommonJS
                     ? this.f.createPropertyAccessExpression(
-                      this.f.createIdentifier('client_1'),
-                      this.f.createIdentifier('default')
-                    )
+                        this.f.createIdentifier('client_1'),
+                        this.f.createIdentifier('default')
+                      )
                     : this.f.createIdentifier('Client'),
                   this.f.createIdentifier('execute')
                 ),
@@ -363,11 +362,11 @@ class Transformer {
                           ),
                           ...(member.group
                             ? [
-                              this.f.createPropertyAssignment(
-                                this.f.createIdentifier('group'),
-                                this.f.createStringLiteral(member.group)
-                              ),
-                            ]
+                                this.f.createPropertyAssignment(
+                                  this.f.createIdentifier('group'),
+                                  this.f.createStringLiteral(member.group)
+                                ),
+                              ]
                             : []),
                         ],
                         false
@@ -394,8 +393,10 @@ class Transformer {
       ],
       'constructorParameters',
       undefined,
-      this.f.createArrayTypeNode(this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
-      undefined,
+      this.f.createArrayTypeNode(
+        this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+      ),
+      undefined
     );
   }
 
@@ -414,22 +415,27 @@ class Transformer {
           this.f.createToken(ts.SyntaxKind.DotDotDotToken),
           this.f.createIdentifier('args'),
           undefined,
-          this.f.createArrayTypeNode(this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
+          this.f.createArrayTypeNode(
+            this.f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+          ),
           undefined
         ),
       ],
-      this.f.createBlock([
-        this.f.createExpressionStatement(
-          this.f.createBinaryExpression(
-            this.f.createPropertyAccessExpression(
-              this.f.createThis(),
-              this.f.createIdentifier('constructorParameters')
-            ),
-            this.f.createToken(ts.SyntaxKind.EqualsToken),
-            this.f.createIdentifier('args')
-          )
-        ),
-      ], true)
+      this.f.createBlock(
+        [
+          this.f.createExpressionStatement(
+            this.f.createBinaryExpression(
+              this.f.createPropertyAccessExpression(
+                this.f.createThis(),
+                this.f.createIdentifier('constructorParameters')
+              ),
+              this.f.createToken(ts.SyntaxKind.EqualsToken),
+              this.f.createIdentifier('args')
+            )
+          ),
+        ],
+        true
+      )
     );
   }
 
@@ -470,9 +476,9 @@ class Transformer {
               this.f.createPropertyAccessExpression(
                 module === ts.ModuleKind.CommonJS
                   ? this.f.createPropertyAccessExpression(
-                    this.f.createIdentifier('client_1'),
-                    this.f.createIdentifier('default')
-                  )
+                      this.f.createIdentifier('client_1'),
+                      this.f.createIdentifier('default')
+                    )
                   : this.f.createIdentifier('Client'),
                 this.f.createIdentifier('execute')
               ),
