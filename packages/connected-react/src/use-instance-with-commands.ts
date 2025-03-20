@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { CommandBuilder, Newable } from './types.js';
+import type { CommandBuilder, Newable } from './types.js';
 import ConnectedContext from './connected-context.js';
 import buildCommands from './build-commands.js';
 

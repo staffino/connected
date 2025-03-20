@@ -1,4 +1,4 @@
-import { CommandBuilder, Newable } from './types.js';
+import type { CommandBuilder, Newable } from './types.js';
 import useInstanceWithSuspendedCommands from './use-instance-with-suspended-commands.js';
 
 export default function useSuspendedCommands<

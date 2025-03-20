@@ -1,11 +1,11 @@
 import EventEmitter from 'events';
-import { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
-import { ResolveRoot } from './resolve-root.js';
-import { ResolveFiles } from './resolve-files.js';
-import { RequireFile } from './require-file.js';
-import { ExtractCallable } from './extract-callable.js';
-import { CreateMeta } from './create-meta.js';
-import { BuildCallableMap } from './build-callabale-map.js';
+import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
+import type { ResolveRoot } from './resolve-root.js';
+import type { ResolveFiles } from './resolve-files.js';
+import type { RequireFile } from './require-file.js';
+import type { ExtractCallable } from './extract-callable.js';
+import type { CreateMeta } from './create-meta.js';
+import type { BuildCallableMap } from './build-callabale-map.js';
 import Executor from './executor.js';
 
 export default class ExecutorBuilderImplementation extends EventEmitter {

@@ -13,7 +13,7 @@ import type {
   JSONRPCRequest,
   JSONRPCResultLike,
 } from 'jayson';
-import { SerializableValue } from './types.js';
+import type { SerializableValue } from './types.js';
 import RpcError from './rpc-error.js';
 
 export type RpcTransferOptions = {

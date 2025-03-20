@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
 import middleware from './rpc-transfer-middleware.js';
-import { Request } from './types.js';
+import type { Request } from './types.js';
 
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();

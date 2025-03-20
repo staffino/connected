@@ -1,16 +1,16 @@
 import {
   createError,
   createResponse,
-  ErrorPayload,
-  Notification,
+  type ErrorPayload,
+  type Notification,
   parseMessage,
   ParserError,
-  Request,
-  RequestPayload,
-  ResponsePayload,
+  type Request,
+  type RequestPayload,
+  type ResponsePayload,
 } from 'json-rpc-msg';
 import { json } from 'body-parser';
-import { IHandler, IExecutor } from '../types.js';
+import type { IHandler, IExecutor } from '../types.js';
 
 type IncommingMessage = import('http').IncomingMessage;
 type ServerResponse = import('http').ServerResponse;

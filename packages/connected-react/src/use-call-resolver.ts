@@ -2,7 +2,7 @@ import React, { useCallback, useReducer, startTransition } from 'react';
 import md5 from 'md5';
 import stringify from 'fast-json-stable-stringify';
 import ConnectedContext from './connected-context.js';
-import {
+import type {
   Command,
   Meta,
   SerializableFunction,

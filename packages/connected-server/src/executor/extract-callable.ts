@@ -1,4 +1,4 @@
-import { Callable } from './types.js';
+import type { Callable } from './types.js';
 import buildCallableMap from './build-callabale-map.js';
 
 function createCallableCollection(

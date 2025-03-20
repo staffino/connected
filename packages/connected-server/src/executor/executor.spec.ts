@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import Executor from './executor.js';
-import { Callable, CallableMap } from './types.js';
+import type { Callable, CallableMap } from './types.js';
 
 class A {
   constructor(private c1: string = '') {}

@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { Newable } from './types.js';
+import type { Newable } from './types.js';
 import useInstance from './use-instance.js';
 import ConnectedProvider from './connected-provider.js';
 

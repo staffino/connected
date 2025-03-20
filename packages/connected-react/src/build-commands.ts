@@ -1,4 +1,4 @@
-import { CommandBuilder, Newable, ResolverFunction } from './types.js';
+import type { CommandBuilder, Newable, ResolverFunction } from './types.js';
 
 export default function buildCommands<
   T extends object,

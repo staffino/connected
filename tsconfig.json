@@ -21,7 +21,8 @@
     "noUnusedParameters": true,
     "removeComments": true,
     "sourceMap": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "verbatimModuleSyntax": true
   },
   "references": [
     { "path": "packages/connected-client" },

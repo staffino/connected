@@ -6,10 +6,15 @@ import { afterEach, describe, expect, it } from 'vitest';
 import * as React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { IsExact, assert } from 'conditional-type-checks';
+import { type IsExact, assert } from 'conditional-type-checks';
 import useResult from './use-result.js';
 import { useCommands } from './index.js';
-import { Command, FunctionKeys, Newable, SafeParameters } from './types.js';
+import type {
+  Command,
+  FunctionKeys,
+  Newable,
+  SafeParameters,
+} from './types.js';
 import ErrorHandler from './error-handler.js';
 
 function f0() {

@@ -1,4 +1,4 @@
-import { IExecutor } from './executor/types.js';
+import type { IExecutor } from './executor/types.js';
 
 export type SerializableValue =
   | null
@@ -22,4 +22,4 @@ export interface IHandler {
   canHandle(request: IncommingMessage): boolean;
 }
 
-export { IExecutor };
+export { type IExecutor };

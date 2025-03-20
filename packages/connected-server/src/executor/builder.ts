@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
+import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
 import ExecutorBuilderImplementation from './builder-implementation.js';
 import resolveRoot from './resolve-root.js';
 import resolveFiles from './resolve-files.js';

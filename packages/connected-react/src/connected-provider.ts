@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { CacheItem, SerializableValue, Newable } from './types.js';
+import type { CacheItem, SerializableValue, Newable } from './types.js';
 import Lru from './lru.js';
 import ConnectedContext from './connected-context.js';
 

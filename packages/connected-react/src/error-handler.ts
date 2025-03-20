@@ -1,5 +1,5 @@
 import React from 'react';
-import { ErrorHandlerFunction } from './types.js';
+import type { ErrorHandlerFunction } from './types.js';
 import ErrorHandlerContext from './error-handler-context.js';
 
 type Props = {
