@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
 import type { ResolveRoot } from './resolve-root.js';
 import type { ResolveFiles } from './resolve-files.js';
-import type { RequireFile } from './require-file.js';
+import type { ImportModule } from './import-module.js';
 import type { ExtractCallable } from './extract-callable.js';
 import type { CreateMeta } from './create-meta.js';
 import type { BuildCallableMap } from './build-callabale-map.js';
@@ -12,7 +12,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
   constructor(
     private readonly resolveRoot: ResolveRoot,
     private readonly resolveFiles: ResolveFiles,
-    private readonly requireFile: RequireFile,
+    private readonly importModule: ImportModule,
     private readonly extractCallable: ExtractCallable,
     private readonly createMeta: CreateMeta,
     private readonly buildCallableMap: BuildCallableMap
@@ -56,7 +56,9 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
           matchBase: true,
         })
       )
-      .then((files) => files.map((file) => this.requireFile(file)))
+      .then((files) =>
+        Promise.all(files.map((file) => this.importModule(file)))
+      )
       .then((exports) =>
         exports
           .map((e) => this.extractCallable(e))

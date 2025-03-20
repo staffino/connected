@@ -3,7 +3,7 @@ import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
 import ExecutorBuilderImplementation from './builder-implementation.js';
 import resolveRoot from './resolve-root.js';
 import resolveFiles from './resolve-files.js';
-import requireFile from './require-file.js';
+import importModule from './import-module.js';
 import extractCallable from './extract-callable.js';
 import createMeta from './create-meta.js';
 import buildCallableMap from './build-callabale-map.js';
@@ -12,7 +12,7 @@ export default class ExecutorBuilder extends EventEmitter {
   private implementation = new ExecutorBuilderImplementation(
     resolveRoot,
     resolveFiles,
-    requireFile,
+    importModule,
     extractCallable,
     createMeta,
     buildCallableMap

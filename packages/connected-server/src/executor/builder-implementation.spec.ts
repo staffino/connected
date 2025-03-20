@@ -6,7 +6,7 @@ describe('ExecutorBuilderImplementation', () => {
     it('uses default values if no parameters are given', async () => {
       const resolveRoot = vi.fn(async (_dir) => '/root');
       const resolveFiles = vi.fn(async (_pattern, _options) => []);
-      const requireFile = vi.fn();
+      const importModule = vi.fn();
       const extractCallable = vi.fn();
       const createMeta = vi.fn();
       const buildCallableMap = vi.fn();
@@ -14,7 +14,7 @@ describe('ExecutorBuilderImplementation', () => {
       const builder = new ExecutorBuilderImplementation(
         resolveRoot,
         resolveFiles,
-        requireFile,
+        importModule,
         extractCallable,
         createMeta,
         buildCallableMap
@@ -32,7 +32,7 @@ describe('ExecutorBuilderImplementation', () => {
     it('passes call map to executor', async () => {
       const resolveRoot = vi.fn();
       const resolveFiles = vi.fn(async (_pattern, _options) => ['file1']);
-      const requireFile = vi.fn();
+      const importModule = vi.fn();
       const extractCallable = vi.fn();
       const createMeta = vi.fn();
       const buildCallableMap = vi.fn(
@@ -42,7 +42,7 @@ describe('ExecutorBuilderImplementation', () => {
       const builder = new ExecutorBuilderImplementation(
         resolveRoot,
         resolveFiles,
-        requireFile,
+        importModule,
         extractCallable,
         createMeta,
         buildCallableMap
@@ -54,7 +54,7 @@ describe('ExecutorBuilderImplementation', () => {
     it('emits event when found a callable', async () => {
       const resolveRoot = vi.fn();
       const resolveFiles = vi.fn(async (_pattern, _options) => ['file1']);
-      const requireFile = vi.fn();
+      const importModule = vi.fn();
       const extractCallable = vi.fn((_file) => [{ fn: () => 0, name: 'f1' }]);
       const createMeta = vi.fn();
       const buildCallableMap = vi.fn();
@@ -64,7 +64,7 @@ describe('ExecutorBuilderImplementation', () => {
       const builder = new ExecutorBuilderImplementation(
         resolveRoot,
         resolveFiles,
-        requireFile,
+        importModule,
         extractCallable,
         createMeta,
         buildCallableMap
@@ -78,7 +78,7 @@ describe('ExecutorBuilderImplementation', () => {
     it('passes options to executor', async () => {
       const resolveRoot = vi.fn();
       const resolveFiles = vi.fn(async (_pattern, _options) => []);
-      const requireFile = vi.fn();
+      const importModule = vi.fn();
       const extractCallable = vi.fn();
       const createMeta = vi.fn();
       const buildCallableMap = vi.fn();
@@ -86,7 +86,7 @@ describe('ExecutorBuilderImplementation', () => {
       const builder = new ExecutorBuilderImplementation(
         resolveRoot,
         resolveFiles,
-        requireFile,
+        importModule,
         extractCallable,
         createMeta,
         buildCallableMap
