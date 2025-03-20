@@ -33,7 +33,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
       options.dir = process.cwd();
     }
     if (!options.pattern) {
-      options.pattern = __filename.match(/\.ts$/)
+      options.pattern = import.meta.filename.match(/\.ts$/)
         ? '*.server.ts'
         : '*.server.js';
     }
