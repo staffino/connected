@@ -1,10 +1,11 @@
 import extractCallable from './extract-callable';
 
-class A { x1() {} }
+class A {
+  x1() {}
+}
 const named = () => 0;
 
 describe('extractCallable', () => {
-
   it('extracts default es fn', () => {
     const exported = extractCallable(named, __filename);
     expect(exported).toHaveLength(1);
@@ -96,6 +97,8 @@ describe('extractCallable', () => {
   });
 
   it('checks for conflicts', () => {
-    expect(() => extractCallable({ named: A, default: named })).toThrowError(TypeError);
+    expect(() => extractCallable({ named: A, default: named })).toThrowError(
+      TypeError
+    );
   });
 });

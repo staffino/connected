@@ -14,7 +14,16 @@ describe('buildCallableMap', () => {
       { name: 'B', fn: f },
     ];
     const map = buildCallableMap(collection);
-    expect(Array.from(map.keys())).toMatchObject(['a', 'b', 'A.x', 'A.y', 'A', 'B.x', 'B.y', 'B']);
+    expect(Array.from(map.keys())).toMatchObject([
+      'a',
+      'b',
+      'A.x',
+      'A.y',
+      'A',
+      'B.x',
+      'B.y',
+      'B',
+    ]);
   });
 
   it('throws if collision', () => {

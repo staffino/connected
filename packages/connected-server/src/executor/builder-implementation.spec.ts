@@ -3,7 +3,7 @@ import ExecutorBuilderImplementation from './builder-implementation';
 describe('ExecutorBuilderImplementation', () => {
   describe('#scanDir', () => {
     it('uses default values if no parameters are given', async () => {
-      const resolveRoot = jest.fn(async dir => '/root');
+      const resolveRoot = jest.fn(async (dir) => '/root');
       const resolveFiles = jest.fn(async (pattern, options) => []);
       const requireFile = jest.fn();
       const extractCallable = jest.fn();
@@ -16,7 +16,7 @@ describe('ExecutorBuilderImplementation', () => {
         requireFile,
         extractCallable,
         createMeta,
-        buildCallableMap,
+        buildCallableMap
       );
       await builder.scanDir();
       expect(resolveFiles.mock.calls.length).toBe(1);
@@ -34,7 +34,9 @@ describe('ExecutorBuilderImplementation', () => {
       const requireFile = jest.fn();
       const extractCallable = jest.fn();
       const createMeta = jest.fn();
-      const buildCallableMap = jest.fn(() => new Map([['f1', { fn: () => 0, name: 'f1' }]]));
+      const buildCallableMap = jest.fn(
+        () => new Map([['f1', { fn: () => 0, name: 'f1' }]])
+      );
 
       const builder = new ExecutorBuilderImplementation(
         resolveRoot,
@@ -42,7 +44,7 @@ describe('ExecutorBuilderImplementation', () => {
         requireFile,
         extractCallable,
         createMeta,
-        buildCallableMap,
+        buildCallableMap
       );
       const executor: any = await builder.scanDir();
       expect(executor.callableMap.get('f1')).toMatchObject({ name: 'f1' });
@@ -52,7 +54,7 @@ describe('ExecutorBuilderImplementation', () => {
       const resolveRoot = jest.fn();
       const resolveFiles = jest.fn(async (pattern, options) => ['file1']);
       const requireFile = jest.fn();
-      const extractCallable = jest.fn(file => [{ fn: () => 0, name: 'f1' }]);
+      const extractCallable = jest.fn((file) => [{ fn: () => 0, name: 'f1' }]);
       const createMeta = jest.fn();
       const buildCallableMap = jest.fn();
 
@@ -64,7 +66,7 @@ describe('ExecutorBuilderImplementation', () => {
         requireFile,
         extractCallable,
         createMeta,
-        buildCallableMap,
+        buildCallableMap
       );
       builder.on('callableFound', eventSink);
       await builder.scanDir();
@@ -86,7 +88,7 @@ describe('ExecutorBuilderImplementation', () => {
         requireFile,
         extractCallable,
         createMeta,
-        buildCallableMap,
+        buildCallableMap
       );
       const factory = (): null => null;
       const executor: any = await builder.scanDir({ factory });

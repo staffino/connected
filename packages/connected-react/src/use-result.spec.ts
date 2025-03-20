@@ -108,15 +108,11 @@ function Wrapper({ hookFn }: { hookFn: () => any }) {
 
 describe('useResult', () => {
   it('uses function with 0 parameters', () => {
-    render(
-      React.createElement(Wrapper, { hookFn: () => useResult(f0) })
-    );
+    render(React.createElement(Wrapper, { hookFn: () => useResult(f0) }));
     expect(screen.getByText('f0')).toBeInTheDocument();
   });
   it('uses function with 1 parameters', () => {
-    render(
-      React.createElement(Wrapper, { hookFn: () => useResult(f1, 'a1') })
-    );
+    render(React.createElement(Wrapper, { hookFn: () => useResult(f1, 'a1') }));
     expect(screen.getByText('1')).toBeInTheDocument();
   });
   it('uses function with 2 parameters', () => {

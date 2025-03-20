@@ -40,7 +40,12 @@ export default function useCallResolver() {
   const { onError: handleError } = React.useContext(ErrorHandlerContext);
   const [, forceReload] = useReducer((x) => x + 1, 0);
   const tryFetchData = useCallback(
-    (cacheKey: string, fn: (...args: any[]) => any, args: any[], stalledData: any) => {
+    (
+      cacheKey: string,
+      fn: (...args: any[]) => any,
+      args: any[],
+      stalledData: any
+    ) => {
       let result;
       try {
         result = fn(...args);
@@ -65,7 +70,9 @@ export default function useCallResolver() {
         if (entry?.data !== undefined) {
           // we are not throwing promise, so we need to refresh once we update the data
           result.finally(() => {
-            startTransition(() => { forceReload(); })
+            startTransition(() => {
+              forceReload();
+            });
           });
           return entry.data;
         }

@@ -1,6 +1,8 @@
-import createMeta  from './create-meta';
+import createMeta from './create-meta';
 
-class A { m1() {} }
+class A {
+  m1() {}
+}
 function f1() {}
 
 describe('createMeta', () => {

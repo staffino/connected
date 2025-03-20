@@ -131,17 +131,21 @@ describe('RpcTransfer', () => {
   });
 
   it('uses custom headers', async () => {
-    fetchMock.mockResponseOnce(
-      (request) => Promise.resolve(JSON.stringify([{
-        jsonrpc: '2.0',
-        result: request.headers.get('x-application-id'),
-        id: '1'
-      }]))
+    fetchMock.mockResponseOnce((request) =>
+      Promise.resolve(
+        JSON.stringify([
+          {
+            jsonrpc: '2.0',
+            result: request.headers.get('x-application-id'),
+            id: '1',
+          },
+        ])
+      )
     );
     const transfer = new RpcTransfer({
       headers: { 'x-application-id': '@connected' },
     });
     const result = await transfer.request('a', { _name: 'b', params: {} });
     expect(result).toBe('@connected');
-  })
+  });
 });

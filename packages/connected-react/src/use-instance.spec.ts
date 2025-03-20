@@ -38,9 +38,7 @@ function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
 }
 describe('useInstance', () => {
   it('creates an instance of a class', () => {
-    render(
-      React.createElement(Wrapper, { hookFn: () => useInstance(X) })
-    );
+    render(React.createElement(Wrapper, { hookFn: () => useInstance(X) }));
     expect(screen.getByText(42)).toBeInTheDocument();
   });
 

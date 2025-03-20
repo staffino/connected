@@ -51,7 +51,7 @@ export default class RpcTransfer {
       url = urlOrOptions;
     } else if (typeof urlOrOptions === 'object') {
       url = urlOrOptions.url ?? url;
-      headers = urlOrOptions.headers ?? {}
+      headers = urlOrOptions.headers ?? {};
     }
 
     function serverRequester(

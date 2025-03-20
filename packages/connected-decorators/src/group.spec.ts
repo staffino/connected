@@ -11,5 +11,5 @@ describe(group, () => {
   it('does nothing', () => {
     const a = new A();
     expect(a.a()).toBe(42);
-  })
+  });
 });

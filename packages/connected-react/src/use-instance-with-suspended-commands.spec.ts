@@ -13,12 +13,12 @@ import useInstanceWithSuspendedCommands from './use-instance-with-suspended-comm
 class X {
   p1: string;
 
-  constructor(private a1: string) {
-  }
+  constructor(private a1: string) {}
 
   str() {
     return this.a1 ?? '42';
   }
+
   promised(): Promise<string> {
     return Promise.resolve(this.a1 ?? '42');
   }
@@ -42,7 +42,6 @@ assert<IsExact<ReturnType<typeof fn2>, string>>(true);
 const fn3 = () => useInstanceWithSuspendedCommands(X)[1].promised()();
 assert<IsExact<ReturnType<typeof fn3>, string>>(true);
 
-
 // str() instance return type is string
 const fn4 = () => useInstanceWithSuspendedCommands(X, '3.14')[0].str();
 assert<IsExact<ReturnType<typeof fn4>, string>>(true);
@@ -51,51 +50,66 @@ assert<IsExact<ReturnType<typeof fn4>, string>>(true);
 const fn5 = () => useInstanceWithSuspendedCommands(X)[0].str();
 assert<IsExact<ReturnType<typeof fn5>, string>>(true);
 
-
-const CommandWrapper = ({ hookFn, fn = 'str' }: { hookFn: Function, fn?: string }) => {
+function CommandWrapper({
+  hookFn,
+  fn = 'str',
+}: {
+  hookFn: Function;
+  fn?: string;
+}) {
   const [, data] = hookFn();
   const command = data[fn]();
   return React.createElement(React.Fragment, null, command());
-};
-const CommandCustomFactoryWrapper = ({ hookFn, fn = 'str' }: { hookFn: Function, fn?: string }) => {
+}
+function CommandCustomFactoryWrapper({
+  hookFn,
+  fn = 'str',
+}: {
+  hookFn: Function;
+  fn?: string;
+}) {
   return React.createElement(
     ConnectedProvider,
     { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass('pi') },
     React.createElement(
       React.Suspense,
       { fallback: '...' },
-      React.createElement(CommandWrapper, { hookFn, fn })),
+      React.createElement(CommandWrapper, { hookFn, fn })
+    )
   );
-};
-const InstanceWrapper = ({ hookFn }: { hookFn: Function }) => {
+}
+function InstanceWrapper({ hookFn }: { hookFn: Function }) {
   const [data] = hookFn();
   return React.createElement(React.Fragment, null, data.str());
-};
-const InstanceCustomFactoryWrapper = ({ hookFn }: { hookFn: Function}) => {
+}
+function InstanceCustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
   return React.createElement(
     ConnectedProvider,
     { factory: <T>(klass: Newable<T>, ...args: any[]) => new klass('pi') },
     React.createElement(
       React.Suspense,
       { fallback: '...' },
-      React.createElement(InstanceWrapper, { hookFn }),
-    ),
+      React.createElement(InstanceWrapper, { hookFn })
+    )
   );
-};
+}
 describe('useInstanceWithSuspendedCommands', () => {
   it('uses command object', () => {
-    render(React.createElement(
-      CommandWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
+    render(
+      React.createElement(CommandWrapper, {
+        hookFn: () => useInstanceWithSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   xit('strips promise', async () => {
     await act(async () => {
       render(
-        React.createElement(
-          CommandCustomFactoryWrapper,
-          { fn: 'promised', hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }
-        )
+        React.createElement(CommandCustomFactoryWrapper, {
+          fn: 'promised',
+          hookFn: () => useInstanceWithSuspendedCommands(X, '3.14'),
+        })
       );
     });
     screen.debug();
@@ -103,20 +117,29 @@ describe('useInstanceWithSuspendedCommands', () => {
   });
 
   it('uses command object with custom factory', () => {
-    render(React.createElement(
-      CommandCustomFactoryWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
+    render(
+      React.createElement(CommandCustomFactoryWrapper, {
+        hookFn: () => useInstanceWithSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(screen.getByText('pi')).toBeInTheDocument();
   });
 
   it('uses instance object', () => {
-    render(React.createElement(
-      InstanceWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
+    render(
+      React.createElement(InstanceWrapper, {
+        hookFn: () => useInstanceWithSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(screen.getByText('3.14')).toBeInTheDocument();
   });
 
   it('uses command object with custom factory', () => {
-    render(React.createElement(
-      InstanceCustomFactoryWrapper, { hookFn: () => useInstanceWithSuspendedCommands(X, '3.14') }));
+    render(
+      React.createElement(InstanceCustomFactoryWrapper, {
+        hookFn: () => useInstanceWithSuspendedCommands(X, '3.14'),
+      })
+    );
     expect(screen.getByText('pi')).toBeInTheDocument();
   });
 });
