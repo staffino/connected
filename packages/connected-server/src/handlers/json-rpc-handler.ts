@@ -1,16 +1,17 @@
-import {
-  createError,
-  createResponse,
-  type ErrorPayload,
-  type Notification,
-  parseMessage,
-  ParserError,
-  type Request,
-  type RequestPayload,
-  type ResponsePayload,
+import type {
+  ErrorPayload,
+  Notification,
+  ParserError as ParserErrorType,
+  Request,
+  RequestPayload,
+  ResponsePayload,
 } from 'json-rpc-msg';
-import { json } from 'body-parser';
+import jsonRpcMsg from 'json-rpc-msg';
+import bodyParser from 'body-parser';
 import type { IHandler, IExecutor } from '../types.js';
+
+const { createError, createResponse, parseMessage, ParserError } = jsonRpcMsg;
+const { json } = bodyParser;
 
 type IncommingMessage = import('http').IncomingMessage;
 type ServerResponse = import('http').ServerResponse;
@@ -81,7 +82,7 @@ function processRequest(
 }
 
 function processBatch(
-  payload: (Request | Notification | ParserError)[],
+  payload: (Request | Notification | ParserErrorType)[],
   response: ServerResponse,
   executor: IExecutor
 ): Promise<void> {
