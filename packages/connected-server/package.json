@@ -28,7 +28,7 @@
     "test": "run-s test:syntax test:vitest",
     "test:syntax": "tsc --noEmit",
     "test:vitest": "vitest run",
-    "prebuild": "npm run clean",
+    "prebuild": "pnpm run clean",
     "build": "tsc --build  tsconfig.build.json",
     "lint": "eslint -c '../../.eslintrc.json'",
     "clean": "rimraf coverage *.tsbuildinfo dist/*"
