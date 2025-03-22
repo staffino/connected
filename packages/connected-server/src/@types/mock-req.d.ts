@@ -1,5 +1,4 @@
 declare module 'mock-req' {
-
   import { IncomingMessage } from 'http';
 
   export type Options = {
@@ -12,6 +11,7 @@ declare module 'mock-req' {
     constructor(options?: Options);
 
     write(data: string | object | Buffer);
+
     end();
   }
 }

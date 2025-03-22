@@ -1,19 +1,21 @@
-import extractCallable from './extract-callable';
+import { describe, expect, it } from 'vitest';
+import extractCallable from './extract-callable.js';
 
-class A { x1() {} }
+class A {
+  x1() {}
+}
 const named = () => 0;
 
 describe('extractCallable', () => {
-
   it('extracts default es fn', () => {
-    const exported = extractCallable(named, __filename);
+    const exported = extractCallable(named, import.meta.filename);
     expect(exported).toHaveLength(1);
     expect(exported[0].fn).toBe(named);
     expect(exported[0].name).toBe('named');
   });
 
   it('extracts default cjs fn', () => {
-    const exported = extractCallable({ default: named }, __filename);
+    const exported = extractCallable({ default: named }, import.meta.filename);
     expect(exported).toHaveLength(1);
     expect(exported[0].fn).toBe(named);
     expect(exported[0].name).toBe('named');
@@ -27,7 +29,7 @@ describe('extractCallable', () => {
   });
 
   it('extracts default es class', () => {
-    const exported = extractCallable(A, __filename);
+    const exported = extractCallable(A, import.meta.filename);
     expect(exported).toHaveLength(2);
     expect(exported[0].fn).toBe(A);
     expect(exported[0].name).toBe('A');
@@ -37,7 +39,7 @@ describe('extractCallable', () => {
   });
 
   it('extracts default cjs class', () => {
-    const exported = extractCallable({ default: A }, __filename);
+    const exported = extractCallable({ default: A }, import.meta.filename);
     expect(exported).toHaveLength(2);
     expect(exported[1].fn).toBe(A);
     expect(exported[1].name).toBe('A');
@@ -96,6 +98,8 @@ describe('extractCallable', () => {
   });
 
   it('checks for conflicts', () => {
-    expect(() => extractCallable({ named: A, default: named })).toThrowError(TypeError);
+    expect(() => extractCallable({ named: A, default: named })).toThrowError(
+      TypeError
+    );
   });
 });

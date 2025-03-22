@@ -5,16 +5,16 @@
  * Created by Martin Komara, September 2019
  */
 import find from 'array-find';
-import uuid from 'uuid/v4';
+import uuid from 'uuid/v4.js';
 import DataLoader from 'dataloader';
-import JaysonBrowserClient from 'jayson/lib/client/browser';
+import JaysonBrowserClient from 'jayson/lib/client/browser/index.js';
 import type {
   JSONRPCErrorLike,
   JSONRPCRequest,
   JSONRPCResultLike,
 } from 'jayson';
-import { SerializableValue } from './types';
-import RpcError from './rpc-error';
+import type { SerializableValue } from './types.js';
+import RpcError from './rpc-error.js';
 
 export type RpcTransferOptions = {
   url?: string;
@@ -51,7 +51,7 @@ export default class RpcTransfer {
       url = urlOrOptions;
     } else if (typeof urlOrOptions === 'object') {
       url = urlOrOptions.url ?? url;
-      headers = urlOrOptions.headers ?? {}
+      headers = urlOrOptions.headers ?? {};
     }
 
     function serverRequester(

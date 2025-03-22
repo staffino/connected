@@ -1,7 +1,7 @@
 type HandlerType = 'Normal' | 'Error';
 
 type TypedHandler = {
-  type: HandlerType,
+  type: HandlerType;
   handler: (next: Function, ...args: any[]) => void;
 };
 type NormalHandler = (next: Function, ...args: any[]) => void;
@@ -13,6 +13,7 @@ export default class Middleware {
   use(handler: NormalHandler) {
     this.handlers.push({ handler, type: 'Normal' });
   }
+
   useErrorHandler(handler: ErrorHandler) {
     this.handlers.push({ handler, type: 'Error' });
   }
@@ -21,7 +22,12 @@ export default class Middleware {
     this.processHandlers(this.handlers, done, args, undefined);
   }
 
-  private processHandlers(handlers: TypedHandler[], done: Function, args: any[], error: any) {
+  private processHandlers(
+    handlers: TypedHandler[],
+    done: Function,
+    args: any[],
+    error: any
+  ) {
     const [handler, ...tail] = handlers;
     if (!handler) {
       done(error);
@@ -32,12 +38,10 @@ export default class Middleware {
       const skipHandler = !!error !== (handler.type === 'Error');
       if (skipHandler) {
         next(error);
+      } else if (error) {
+        handler.handler(error, next, ...args);
       } else {
-        if (error) {
-          handler.handler(error, next, ...args);
-        } else {
-          handler.handler(next, ...args);
-        }
+        handler.handler(next, ...args);
       }
     } catch (error) {
       next(error);

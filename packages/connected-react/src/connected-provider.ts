@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
-import { CacheItem, SerializableValue, Newable } from './types';
-import Lru from './lru';
-import ConnectedContext from './connected-context';
+import type { CacheItem, SerializableValue, Newable } from './types.js';
+import Lru from './lru.js';
+import ConnectedContext from './connected-context.js';
 
 type Props = {
   maxCacheSize?: number;

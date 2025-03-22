@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import { CommandBuilder, Newable } from './types';
-import ConnectedContext from './connected-context';
-import buildCommands from './build-commands';
+import type { CommandBuilder, Newable } from './types.js';
+import ConnectedContext from './connected-context.js';
+import buildCommands from './build-commands.js';
 
 export default function useInstanceWithCommands<
   C extends Newable<T>,

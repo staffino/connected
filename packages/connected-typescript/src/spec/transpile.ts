@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
-import { CJS_CONFIG } from './options';
-import readFile from './read-file';
+import { CJS_CONFIG } from './options.js';
+import readFile from './read-file.js';
 
 export default async function transpile(
   file: string,

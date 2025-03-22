@@ -1,5 +1,4 @@
 declare module 'mock-res' {
-
   import { ServerResponse } from 'http';
 
   export default class MockRes extends ServerResponse {

@@ -1,6 +1,7 @@
-import readFile from './spec/read-file';
-import transpile from './spec/transpile';
-import transformer from './transformer';
+import { describe, expect, it } from 'vitest';
+import readFile from './spec/read-file.js';
+import transpile from './spec/transpile.js';
+import transformer from './transformer.js';
 
 describe('Transformer', () => {
   it.each([

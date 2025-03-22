@@ -1,5 +1,5 @@
-import { Newable } from './types';
-import useInstanceWithCommands from './use-instance-with-commands';
+import type { Newable } from './types.js';
+import useInstanceWithCommands from './use-instance-with-commands.js';
 
 export default function useInstance<
   C extends Newable<T>,

@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [ "src/**/*.spec.ts" ],
+  "references": [
+    { "path": "../connected-decorators/tsconfig.build.json" },
+  ]
+}

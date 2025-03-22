@@ -1,14 +1,20 @@
-import Executor from './executor';
-import { Callable, CallableMap } from './types';
+import { describe, expect, it } from 'vitest';
+import Executor from './executor.js';
+import type { Callable, CallableMap } from './types.js';
 
 class A {
-  constructor(private c1: string = '') {
+  constructor(private c1: string = '') {}
+
+  m1(a1 = '') {
+    return `m1.${a1}.${this.c1}`;
   }
-  m1(a1: string = '') { return `m1.${a1}.${this.c1}`; }
-  async m2(a1: string = '') { return `m2.${a1}.${this.c1}`; }
+
+  async m2(a1 = '') {
+    return `m2.${a1}.${this.c1}`;
+  }
 }
-const f1 = (a1: string = '') => `f1.${a1}`;
-const f2 = async (a1: string = '') => `f2.${a1}`;
+const f1 = (a1 = '') => `f1.${a1}`;
+const f2 = async (a1 = '') => `f2.${a1}`;
 
 const callableMap: CallableMap = new Map<string, Callable>([
   ['f1', { name: 'f1', fn: f1 }],
@@ -18,7 +24,6 @@ const callableMap: CallableMap = new Map<string, Callable>([
 ]);
 
 describe('Executor', () => {
-
   it('executes sync function without parameters', async () => {
     const executor = new Executor(callableMap);
     const value = await executor.execute('f1', []);

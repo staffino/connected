@@ -1,4 +1,4 @@
-import tinyLru, { Lru as TinyLru } from 'tiny-lru';
+import tinyLru, { type Lru as TinyLru } from 'tiny-lru';
 
 interface EventListener<T> {
   (action: string, key?: string, value?: T): void;
