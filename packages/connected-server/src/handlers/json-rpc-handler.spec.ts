@@ -1,6 +1,7 @@
+import { describe, expect, it, vi } from 'vitest';
 import MockReq from 'mock-req';
 import MockRes from 'mock-res';
-import JsonRpcHandler from './json-rpc-handler';
+import JsonRpcHandler from './json-rpc-handler.js';
 
 function createRequestMock(data: any) {
   const requestData = JSON.stringify(data);
@@ -22,7 +23,7 @@ function createBatchRpcMock(
   parameters: any[],
   constructorParameters?: any[]
 ) {
-  const data = [...Array(count ?? 1)].map((value, index) => ({
+  const data = [...Array(count ?? 1)].map((_value, index) => ({
     method: 'execute',
     id: 1 + index,
     jsonrpc: '2.0',
@@ -49,6 +50,7 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = new MockReq({ method: 'POST' });
     const response = new MockRes();
+    // @ts-expect-error this is expected to fail
     await handler.process(request, response, null);
     // eslint-disable-next-line no-underscore-dangle
     expect(response._getJSON()).toMatchObject({
@@ -62,7 +64,7 @@ describe('JsonRpcHandler', () => {
     const handler = new JsonRpcHandler();
     const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
-    const executor = { execute: jest.fn().mockResolvedValueOnce(3) };
+    const executor = { execute: vi.fn().mockResolvedValueOnce(3) };
     await handler.process(request, response, executor);
     // eslint-disable-next-line no-underscore-dangle
     expect(response._getJSON()).toMatchObject({
@@ -77,7 +79,7 @@ describe('JsonRpcHandler', () => {
     const request = createRpcMock('add', [1, 2]);
     const response = new MockRes();
     const executor = {
-      execute: jest.fn().mockRejectedValueOnce(new Error('internal')),
+      execute: vi.fn().mockRejectedValueOnce(new Error('internal')),
     };
     await handler.process(request, response, executor);
     // eslint-disable-next-line no-underscore-dangle
@@ -93,7 +95,7 @@ describe('JsonRpcHandler', () => {
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const executor = {
-      execute: jest.fn().mockResolvedValueOnce(3).mockResolvedValueOnce(5),
+      execute: vi.fn().mockResolvedValueOnce(3).mockResolvedValueOnce(5),
     };
     await handler.process(request, response, executor);
     // eslint-disable-next-line no-underscore-dangle
@@ -108,7 +110,7 @@ describe('JsonRpcHandler', () => {
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const executor = {
-      execute: jest
+      execute: vi
         .fn()
         .mockRejectedValueOnce(new Error('r1'))
         .mockRejectedValueOnce(new Error('r2')),
@@ -126,7 +128,7 @@ describe('JsonRpcHandler', () => {
     const request = createBatchRpcMock(2, 'add', [1, 2]);
     const response = new MockRes();
     const executor = {
-      execute: jest
+      execute: vi
         .fn()
         .mockResolvedValueOnce(3)
         .mockRejectedValueOnce(new Error('r2')),
@@ -167,7 +169,7 @@ describe('JsonRpcHandler', () => {
       { jsonrpc: '2.0', params: { name: 'add', parameters: [1, 2] } }, // no method
     ]);
     const response = new MockRes();
-    const executor = { execute: jest.fn().mockResolvedValue(3) };
+    const executor = { execute: vi.fn().mockResolvedValue(3) };
     await handler.process(request, response, executor);
     // eslint-disable-next-line no-underscore-dangle
     expect(response._getJSON()).toMatchObject([

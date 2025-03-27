@@ -1,27 +1,28 @@
 import EventEmitter from 'events';
-import { ExecutorBuilderScanDirOptions, IExecutor } from './types';
-import { ResolveRoot } from './resolve-root';
-import { ResolveFiles } from './resolve-files';
-import { RequireFile } from './require-file';
-import { ExtractCallable } from './extract-callable';
-import { CreateMeta } from './create-meta';
-import { BuildCallableMap } from './build-callabale-map';
-import Executor from './executor';
+import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
+import type { ResolveRoot } from './resolve-root.js';
+import type { ResolveFiles } from './resolve-files.js';
+import type { ImportModule } from './import-module.js';
+import type { ExtractCallable } from './extract-callable.js';
+import type { CreateMeta } from './create-meta.js';
+import type { BuildCallableMap } from './build-callabale-map.js';
+import Executor from './executor.js';
 
 export default class ExecutorBuilderImplementation extends EventEmitter {
-
   constructor(
     private readonly resolveRoot: ResolveRoot,
     private readonly resolveFiles: ResolveFiles,
-    private readonly requireFile: RequireFile,
+    private readonly importModule: ImportModule,
     private readonly extractCallable: ExtractCallable,
     private readonly createMeta: CreateMeta,
-    private readonly buildCallableMap: BuildCallableMap,
+    private readonly buildCallableMap: BuildCallableMap
   ) {
     super();
   }
 
-  scanDir(dirOrOptions?: ExecutorBuilderScanDirOptions|string): Promise<IExecutor> {
+  scanDir(
+    dirOrOptions?: ExecutorBuilderScanDirOptions | string
+  ): Promise<IExecutor> {
     let options: ExecutorBuilderScanDirOptions = {};
     if (typeof dirOrOptions === 'object') {
       options = dirOrOptions;
@@ -32,7 +33,9 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
       options.dir = process.cwd();
     }
     if (!options.pattern) {
-      options.pattern = __filename.match(/\.ts$/) ? '*.server.ts' : '*.server.js';
+      options.pattern = import.meta.filename.match(/\.ts$/)
+        ? '*.server.ts'
+        : '*.server.js';
     }
     if (!options.ignore) {
       options.ignore = 'node_modules';
@@ -46,12 +49,21 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
         }
         return this.resolveRoot(options.dir!);
       })
-      .then(root => this.resolveFiles(
-        options.pattern!,
-        { root, ignore: options.ignore, matchBase: true }))
-      .then(files => files.map(file => this.requireFile(file)))
-      .then(exports => exports.map(
-        e => this.extractCallable(e)).reduce((acc, val) => acc.concat(val), []))
+      .then((root) =>
+        this.resolveFiles(options.pattern!, {
+          root,
+          ignore: options.ignore,
+          matchBase: true,
+        })
+      )
+      .then((files) =>
+        Promise.all(files.map((file) => this.importModule(file)))
+      )
+      .then((exports) =>
+        exports
+          .map((e) => this.extractCallable(e))
+          .reduce((acc, val) => acc.concat(val), [])
+      )
       .then((callables) => {
         callables.forEach((callable) => {
           if (options.createMeta !== false) {
@@ -61,6 +73,6 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
         });
         return this.buildCallableMap(callables);
       })
-      .then(callableMap => new Executor(callableMap, { factory }));
+      .then((callableMap) => new Executor(callableMap, { factory }));
   }
 }

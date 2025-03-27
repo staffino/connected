@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 
+import { describe, expect, it } from 'vitest';
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { assert, IsExact } from 'conditional-type-checks';
-import { Newable } from './types';
-import ConnectedProvider from './connected-provider';
-import useSuspendedCommands from './use-suspended-commands';
+import '@testing-library/jest-dom/vitest';
+import { assert, type IsExact } from 'conditional-type-checks';
+import type { Newable } from './types.js';
+import ConnectedProvider from './connected-provider.js';
+import useSuspendedCommands from './use-suspended-commands.js';
 
 class X {
   p1: string;

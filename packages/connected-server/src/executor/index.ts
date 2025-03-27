@@ -1,1 +1,1 @@
-export { default as ExecutorBuilder } from './builder';
+export { default as ExecutorBuilder } from './builder.js';

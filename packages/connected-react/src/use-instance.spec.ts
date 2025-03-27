@@ -2,12 +2,13 @@
  * @jest-environment jsdom
  */
 
+import { describe, expect, it } from 'vitest';
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { Newable } from './types';
-import useInstance from './use-instance';
-import ConnectedProvider from './connected-provider';
+import '@testing-library/jest-dom/vitest';
+import type { Newable } from './types.js';
+import useInstance from './use-instance.js';
+import ConnectedProvider from './connected-provider.js';
 
 class X {
   constructor(_a1: string) {}
@@ -38,9 +39,7 @@ function CustomFactoryWrapper({ hookFn }: { hookFn: Function }) {
 }
 describe('useInstance', () => {
   it('creates an instance of a class', () => {
-    render(
-      React.createElement(Wrapper, { hookFn: () => useInstance(X) })
-    );
+    render(React.createElement(Wrapper, { hookFn: () => useInstance(X) }));
     expect(screen.getByText(42)).toBeInTheDocument();
   });
 

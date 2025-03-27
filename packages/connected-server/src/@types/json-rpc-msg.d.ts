@@ -25,14 +25,17 @@ declare module 'json-rpc-msg' {
   }
 
   export function parseMessage(
-    message: string|object|object[],
+    message: string | object | object[]
   ): Request | Notification | Batch | ParserError;
 
   export type ResponsePayload = {
     id: number | string;
     result: any;
   };
-  export function createResponse(id: string | number, result: any): ResponsePayload;
+  export function createResponse(
+    id: string | number,
+    result: any
+  ): ResponsePayload;
 
   export type ErrorPayload = {
     id: number | string;
@@ -44,6 +47,7 @@ declare module 'json-rpc-msg' {
   };
   export function createError(
     id: string | number | null,
-    code: number | { code: number, message?: string },
-    details?: any): ErrorPayload;
+    code: number | { code: number; message?: string },
+    details?: any
+  ): ErrorPayload;
 }

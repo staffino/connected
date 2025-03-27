@@ -1,14 +1,14 @@
 import React, { useCallback, useReducer, startTransition } from 'react';
 import md5 from 'md5';
 import stringify from 'fast-json-stable-stringify';
-import ConnectedContext from './connected-context';
-import {
+import ConnectedContext from './connected-context.js';
+import type {
   Command,
   Meta,
   SerializableFunction,
   SerializableValue,
-} from './types';
-import ErrorHandlerContext from './error-handler-context';
+} from './types.js';
+import ErrorHandlerContext from './error-handler-context.js';
 
 type SerializableFunctionWithMeta = SerializableFunction & { meta?: Meta };
 
@@ -40,7 +40,12 @@ export default function useCallResolver() {
   const { onError: handleError } = React.useContext(ErrorHandlerContext);
   const [, forceReload] = useReducer((x) => x + 1, 0);
   const tryFetchData = useCallback(
-    (cacheKey: string, fn: (...args: any[]) => any, args: any[], stalledData: any) => {
+    (
+      cacheKey: string,
+      fn: (...args: any[]) => any,
+      args: any[],
+      stalledData: any
+    ) => {
       let result;
       try {
         result = fn(...args);
@@ -65,7 +70,9 @@ export default function useCallResolver() {
         if (entry?.data !== undefined) {
           // we are not throwing promise, so we need to refresh once we update the data
           result.finally(() => {
-            startTransition(() => { forceReload(); })
+            startTransition(() => {
+              forceReload();
+            });
           });
           return entry.data;
         }

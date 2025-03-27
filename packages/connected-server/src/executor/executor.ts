@@ -1,19 +1,23 @@
-import { CallableMap, ExecutorOptions, IExecutor } from './types';
-import { SerializableValue } from '../types';
+import type { CallableMap, ExecutorOptions, IExecutor } from './types.js';
+import type { SerializableValue } from '../types.js';
 
-type Newable<T> = { new(...args: any[]): T };
+type Newable<T> = { new (...args: any[]): T };
 
 export default class Executor implements IExecutor {
-  constructor(private callableMap: CallableMap, private options: ExecutorOptions = {}) {
+  constructor(
+    private callableMap: CallableMap,
+    private options: ExecutorOptions = {}
+  ) {
     if (!this.options.factory) {
-      this.options.factory = <T>(klass: Newable<T>, ...args: any[]) => new klass(...args);
+      this.options.factory = <T>(klass: Newable<T>, ...args: any[]) =>
+        new klass(...args);
     }
   }
 
   execute(
     name: string,
     parameters: SerializableValue[],
-    constructorParameters?: SerializableValue[],
+    constructorParameters?: SerializableValue[]
   ): Promise<SerializableValue> {
     const callable = this.callableMap.get(name);
     if (!callable) {
@@ -21,7 +25,9 @@ export default class Executor implements IExecutor {
     }
     if (typeof callable.fn !== 'function') {
       if (callable.property) {
-        return Promise.reject(new TypeError(`Class ${callable.name} was not found.`));
+        return Promise.reject(
+          new TypeError(`Class ${callable.name} was not found.`)
+        );
       }
       return Promise.reject(new TypeError(`Function ${name} was not found.`));
     }
@@ -33,15 +39,20 @@ export default class Executor implements IExecutor {
     // class method
     const instance: { [name: string]: Function } = this.options.factory!(
       callable.fn as any,
-      ...(constructorParameters || []));
+      ...(constructorParameters || [])
+    );
     if (!instance) {
       return Promise.reject(
-        new TypeError(`Unable to create an instance of class ${callable.name}.`));
+        new TypeError(`Unable to create an instance of class ${callable.name}.`)
+      );
     }
     const method = instance[callable.property];
     if (typeof method !== 'function') {
       return Promise.reject(
-        new TypeError(`Unable to find method ${callable.name}.${callable.property}`));
+        new TypeError(
+          `Unable to find method ${callable.name}.${callable.property}`
+        )
+      );
     }
     return Promise.resolve(method.call(instance, ...parameters));
   }

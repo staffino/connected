@@ -1,1 +1,1 @@
-export { default as JsonRpcHandler } from './json-rpc-handler';
+export { default as JsonRpcHandler } from './json-rpc-handler.js';

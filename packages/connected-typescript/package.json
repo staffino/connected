@@ -1,6 +1,6 @@
 {
   "name": "@connected/typescript",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "The hassle free way to call your server-side code",
   "keywords": [
     "typescript",
@@ -10,6 +10,7 @@
   "author": "Lucia Gotthardova <lucia@staffino.com>",
   "homepage": "https://staffino.github.io/connected/",
   "license": "ISC",
+  "type": "module",
   "main": "dist/index.js",
   "directories": {
     "dist": "dist"
@@ -23,23 +24,27 @@
   },
   "scripts": {
     "prepare": "run-p build lint",
-    "coverage": "jest --coverage",
-    "test": "run-s test:syntax test:jest",
+    "coverage": "vitest run --coverage",
+    "test": "run-s test:syntax test:vitest",
     "test:syntax": "tsc --noEmit",
-    "test:jest": "jest",
-    "prebuild": "npm run clean",
-    "build": "tsc --build .",
+    "test:vitest": "vitest run",
+    "prebuild": "pnpm run clean",
+    "build": "tsc --build tsconfig.build.json",
     "lint": "eslint -c '../../.eslintrc.json'",
-    "clean": "rimraf coverage build tsconfig.tsbuildinfo dist/*"
+    "clean": "rimraf coverage build *.tsbuildinfo dist/*"
   },
   "bugs": {
     "url": "https://github.com/staffino/connected/issues"
   },
   "dependencies": {
-    "@connected/decorators": "^0.1.3",
+    "@connected/decorators": "workspace:*",
     "array-flatten": "^3.0.0",
     "minimatch": "^3.0.4",
     "typescript": "^5.3"
   },
-  "gitHead": "94aa5f5c83f052742811e320926b3ae674f6cdcb"
+  "gitHead": "94aa5f5c83f052742811e320926b3ae674f6cdcb",
+  "devDependencies": {
+    "@types/minimatch": "~3.0.0",
+    "vitest": "^3.0.9"
+  }
 }

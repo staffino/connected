@@ -1,4 +1,4 @@
-import glob, { IOptions } from 'glob';
+import glob, { type IOptions } from 'glob';
 import * as path from 'path';
 
 export default function resolveFiles(

@@ -1,4 +1,4 @@
-import { SerializableValue } from '../types';
+import type { SerializableValue } from '../types.js';
 
 type Newable<T> = { new (...args: any[]): T };
 

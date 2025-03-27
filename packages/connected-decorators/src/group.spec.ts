@@ -1,4 +1,5 @@
-import group from './group';
+import { describe, expect, it } from 'vitest';
+import group from './group.js';
 
 class A {
   // @ts-ignore
@@ -11,5 +12,5 @@ describe(group, () => {
   it('does nothing', () => {
     const a = new A();
     expect(a.a()).toBe(42);
-  })
+  });
 });

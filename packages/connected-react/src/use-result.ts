@@ -1,11 +1,11 @@
-import {
+import type {
   Command,
   FunctionKeys,
   Newable,
   SafeReturnType,
   SerializableFunction,
-} from './types';
-import useCallResolver from './use-call-resolver';
+} from './types.js';
+import useCallResolver from './use-call-resolver.js';
 
 export default function useResult<M extends FunctionKeys<T>, T extends object>(
   command: Command<M, Newable<T>, T>
