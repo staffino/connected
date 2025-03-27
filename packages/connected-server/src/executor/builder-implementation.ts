@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import EventEmitter from 'events';
 import type { ExecutorBuilderScanDirOptions, IExecutor } from './types.js';
 import type { ResolveRoot } from './resolve-root.js';
@@ -33,7 +34,7 @@ export default class ExecutorBuilderImplementation extends EventEmitter {
       options.dir = process.cwd();
     }
     if (!options.pattern) {
-      options.pattern = import.meta.filename.match(/\.ts$/)
+      options.pattern = fileURLToPath(import.meta.url).match(/\.ts$/)
         ? '*.server.ts'
         : '*.server.js';
     }

@@ -1,5 +1,8 @@
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import extractCallable from './extract-callable.js';
+
+const __filename = fileURLToPath(import.meta.url);
 
 class A {
   x1() {}
@@ -8,14 +11,14 @@ const named = () => 0;
 
 describe('extractCallable', () => {
   it('extracts default es fn', () => {
-    const exported = extractCallable(named, import.meta.filename);
+    const exported = extractCallable(named, __filename);
     expect(exported).toHaveLength(1);
     expect(exported[0].fn).toBe(named);
     expect(exported[0].name).toBe('named');
   });
 
   it('extracts default cjs fn', () => {
-    const exported = extractCallable({ default: named }, import.meta.filename);
+    const exported = extractCallable({ default: named }, __filename);
     expect(exported).toHaveLength(1);
     expect(exported[0].fn).toBe(named);
     expect(exported[0].name).toBe('named');
@@ -29,7 +32,7 @@ describe('extractCallable', () => {
   });
 
   it('extracts default es class', () => {
-    const exported = extractCallable(A, import.meta.filename);
+    const exported = extractCallable(A, __filename);
     expect(exported).toHaveLength(2);
     expect(exported[0].fn).toBe(A);
     expect(exported[0].name).toBe('A');
@@ -39,7 +42,7 @@ describe('extractCallable', () => {
   });
 
   it('extracts default cjs class', () => {
-    const exported = extractCallable({ default: A }, import.meta.filename);
+    const exported = extractCallable({ default: A }, __filename);
     expect(exported).toHaveLength(2);
     expect(exported[1].fn).toBe(A);
     expect(exported[1].name).toBe('A');
